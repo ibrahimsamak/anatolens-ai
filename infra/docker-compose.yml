@@ -1,0 +1,16 @@
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: anatolens
+      POSTGRES_PASSWORD: anatolens
+      POSTGRES_DB: anatolens
+    ports: ["5432:5432"]
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+
+  redis:
+    image: redis7
+    ports: ["6379", "6379"]
+  
+volumes:
+  pgdata:
