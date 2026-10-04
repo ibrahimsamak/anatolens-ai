@@ -1,0 +1,101 @@
+- structure_id: spine.vertebral_column
+  review_status: APPROVED
+  source: "Gray's Anatomy (ملخص تعليمي)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    يتكوّن العمود الفقري من 33 فقرة: 7 عنقية و12 صدرية و5 قطنية و5 عجزية ملتحمة، وغالبًا 4
+    عصعصية ملتحمة. يدعم الرأس والجذع، وينقل وزن الجسم إلى الحوض، ويحمي الحبل الشوكي داخل
+    القناة الفقرية، ويسمح بحركة الجذع.
+
+- structure_id: spine.vertebral_column
+  review_status: APPROVED
+  source: "Gray's Anatomy (ملخص تعليمي)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    للعمود الفقري لدى البالغ أربعة انحناءات. الانحناءان الصدري والعجزي أوّليان (حدب)، مقعّران
+    من الأمام وموجودان منذ الحياة الجنينية. الانحناءان العنقي والقطني ثانويان (قعس)، مقعّران
+    من الخلف، ويتكوّنان حين يرفع الرضيع رأسه ثم يبدأ الوقوف والمشي.
+
+- structure_id: spine.cervical_region
+  review_status: APPROVED
+  source: "Gray's Anatomy (ملخص تعليمي)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    تضم المنطقة العنقية سبع فقرات (C1-C7)، وهي أصغر الفقرات المتحركة. في الناتئ المستعرض لكل
+    منها ثقبة مستعرضة، وتمرّ عبر ثقبات الفقرات C1 إلى C6 الشريانُ الفقري. الفقرة الأولى
+    (الفهقة/الأطلس) بلا جسم وتحمل الجمجمة وتسمح بإيماء الرأس. الفقرة الثانية (المحور) لها
+    السِّن الذي تدور حوله الفهقة لالتفات الرأس.
+
+- structure_id: spine.thoracic_region
+  review_status: APPROVED
+  source: "Gray's Anatomy (ملخص تعليمي)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    تضم المنطقة الصدرية اثنتي عشرة فقرة (T1-T12)، وأهم ما يميّزها وجود سُطيحات ضلعية على
+    أجسامها ونواتئها المستعرضة تتمفصل مع الأضلاع. نواتئها الشوكية طويلة ومائلة إلى الأسفل
+    ومتراكبة. يحدّ القفص الصدري من حركتها، مع أن الدوران حرّ نسبيًا.
+
+- structure_id: spine.lumbar_region
+  review_status: APPROVED
+  source: "Gray's Anatomy (ملخص تعليمي)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    تتكوّن المنطقة القطنية من خمس فقرات (L1-L5)، وهي أكبر الفقرات المتحركة. تحمل معظم وزن
+    الجسم وتسمح بثني أسفل الظهر وبسطه مع دوران محدود. أجسامها كبيرة كلوية الشكل، ونواتئها
+    الشوكية قصيرة وسميكة، ولا تحوي ثقبات مستعرضة ولا سُطيحات ضلعية.
+
+- structure_id: spine.lumbar_region
+  review_status: APPROVED
+  source: "Gray's Anatomy (ملخص تعليمي)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    ينتهي الحبل الشوكي لدى البالغ عادةً عند مستوى L1-L2 (المخروط النخاعي)، وتحوي القناة
+    الفقرية أسفله ذيل الفرس. لذلك يُجرى البزل القطني بين L3 وL4 أو بين L4 وL5 بعيدًا عن الحبل
+    الشوكي.
+
+- structure_id: spine.sacral_region
+  review_status: APPROVED
+  source: "Gray's Anatomy (ملخص تعليمي)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    العجز عظم مثلثي يتكوّن من التحام خمس فقرات عجزية (S1-S5). يتمفصل من الأعلى مع الفقرة L5
+    في المفصل القطني العجزي، ومن الجانبين مع عظمي الحرقفة في المفصلين العجزيين الحرقفيين، ومن
+    الأسفل مع العصعص. ينقل وزن الجسم إلى الحزام الحوضي، وتمرّ عبر ثقباته الأمامية والخلفية
+    فروع الأعصاب الشوكية العجزية.
+
+- structure_id: spine.coccygeal_region
+  review_status: APPROVED
+  source: "Gray's Anatomy (ملخص تعليمي)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    العصعص عظم مثلثي صغير يتكوّن عادةً من التحام أربع فقرات أثرية (وقد تكون من ثلاث إلى خمس).
+    يتمفصل مع قمة العجز، ويُعدّ موضع ارتكاز لأجزاء من العضلة الألوية الكبرى والعضلة العصعصية
+    وللرباط الشرجي العصعصي، ويدعم قاع الحوض.
+
+- structure_id: spine.intervertebral_disc
+  review_status: APPROVED
+  source: "Gray's Anatomy (ملخص تعليمي)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    تربط الأقراص بين الفقرات أجسامَ الفقرات المتجاورة من C2-C3 حتى L5-S1، ولا يوجد قرص بين
+    الجمجمة وC1 ولا بين C1 وC2. يتكوّن القرص من حلقة ليفية خارجية من صفائح الغضروف الليفي
+    ونواة لبّية هلامية داخلية، ويعملان معًا على امتصاص الصدمات والسماح بالحركة.
+
+- structure_id: spine.intervertebral_disc
+  review_status: APPROVED
+  source: "Gray's Anatomy (ملخص تعليمي)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    يحدث انفتاق القرص حين تبرز النواة اللبّية عبر تمزّق في الحلقة الليفية، وغالبًا في الاتجاه
+    الخلفي الجانبي حيث قد تضغط على جذر عصب شوكي. وهو أكثر شيوعًا في أسفل المنطقة القطنية
+    (L4-L5 وL5-S1).

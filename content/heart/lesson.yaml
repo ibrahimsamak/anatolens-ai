@@ -1,0 +1,6 @@
+id: heart_001
+title: The Heart
+system: cardiovascular
+model_url: /assets/heart.glb
+ios_model_url: /assets/heart.usdz
+review_status: APPROVED

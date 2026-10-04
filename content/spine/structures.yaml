@@ -1,0 +1,50 @@
+- id: spine.vertebral_column
+  mesh_name: null
+  display_name_en: Vertebral column
+  display_name_ar: العمود الفقري
+  aliases: [spine, spinal column, backbone, vertebral column, "العمود الفقري"]
+  relations: {}
+
+- id: spine.cervical_region
+  mesh_name: Spine_Cervical
+  display_name_en: Cervical region (C1-C7)
+  display_name_ar: المنطقة العنقية
+  aliases: [cervical, cervical spine, "c1-c7", neck vertebrae, cervical vertebrae, atlas, axis, "الفقرات العنقية"]
+  relations: { part_of: [spine.vertebral_column], connects_to: [spine.thoracic_region] }
+
+- id: spine.thoracic_region
+  mesh_name: Spine_Thoracic
+  display_name_en: Thoracic region (T1-T12)
+  display_name_ar: المنطقة الصدرية
+  aliases: [thoracic, thoracic spine, "t1-t12", dorsal spine, thoracic vertebrae, "الفقرات الصدرية"]
+  relations: { part_of: [spine.vertebral_column], connects_to: [spine.cervical_region, spine.lumbar_region] }
+
+- id: spine.lumbar_region
+  mesh_name: Spine_Lumbar
+  display_name_en: Lumbar region (L1-L5)
+  display_name_ar: المنطقة القطنية
+  aliases: [lumbar, lumbar spine, "l1-l5", "lmbr", lower back vertebrae, lumbar vertebrae, "الفقرات القطنية"]
+  relations: { part_of: [spine.vertebral_column], connects_to: [spine.thoracic_region, spine.sacral_region] }
+
+- id: spine.sacral_region
+  mesh_name: Spine_Sacral
+  display_name_en: Sacrum (S1-S5)
+  display_name_ar: العجز
+  aliases: [sacrum, sacral, sacral region, "s1-s5", sacral vertebrae, "العظم العجزي", "المنطقة العجزية"]
+  relations: { part_of: [spine.vertebral_column], connects_to: [spine.lumbar_region, spine.coccygeal_region] }
+
+- id: spine.coccygeal_region
+  mesh_name: null
+  display_name_en: Coccyx
+  display_name_ar: العصعص
+  aliases: [coccyx, coccygeal, coccygeal region, tailbone, "المنطقة العصعصية"]
+  relations: { part_of: [spine.vertebral_column], connects_to: [spine.sacral_region] }
+
+- id: spine.intervertebral_disc
+  mesh_name: Spine_IntervertebralDiscs
+  display_name_en: Intervertebral discs
+  display_name_ar: الأقراص بين الفقرات
+  aliases: [intervertebral disc, intervertebral discs, disc, disk, spinal disc, nucleus pulposus, annulus fibrosus, "القرص الفقري", "الغضروف بين الفقرات"]
+  relations:
+    part_of: [spine.vertebral_column]
+    connects_to: [spine.cervical_region, spine.thoracic_region, spine.lumbar_region]

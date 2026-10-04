@@ -1,0 +1,141 @@
+- id: heart.heart
+  mesh_name: null
+  display_name_en: Heart
+  display_name_ar: القلب
+  aliases: [heart, cor, cardiac, "القلب"]
+  relations: {}
+
+- id: heart.right_atrium
+  mesh_name: Heart_RightAtrium
+  display_name_en: Right atrium
+  display_name_ar: الأذين الأيمن
+  aliases: [right atrium, ra, "r atrium", "الأذين الأيمن"]
+  relations:
+    part_of: [heart.heart]
+    connects_to: [heart.superior_vena_cava, heart.inferior_vena_cava, heart.tricuspid_valve, heart.cardiac_veins]
+    flows_to: [heart.tricuspid_valve]
+
+- id: heart.tricuspid_valve
+  mesh_name: Heart_TricuspidValve
+  display_name_en: Tricuspid valve
+  display_name_ar: الصمام ثلاثي الشرف
+  aliases: [tricuspid valve, tricuspid, right atrioventricular valve, right av valve, "الصمام ثلاثي الشرفات"]
+  relations:
+    part_of: [heart.heart]
+    connects_to: [heart.right_atrium, heart.right_ventricle]
+    flows_to: [heart.right_ventricle]
+
+- id: heart.right_ventricle
+  mesh_name: Heart_RightVentricle
+  display_name_en: Right ventricle
+  display_name_ar: البطين الأيمن
+  aliases: [right ventricle, rv, "r ventricle", "البطين الأيمن"]
+  relations:
+    part_of: [heart.heart]
+    connects_to: [heart.tricuspid_valve, heart.pulmonary_valve]
+    flows_to: [heart.pulmonary_valve]
+
+- id: heart.pulmonary_valve
+  mesh_name: Heart_PulmonaryValve
+  display_name_en: Pulmonary valve
+  display_name_ar: الصمام الرئوي
+  aliases: [pulmonary valve, pulmonic valve, pulmonary semilunar valve, "الصمام الرئوي"]
+  relations:
+    part_of: [heart.heart]
+    connects_to: [heart.right_ventricle, heart.pulmonary_trunk]
+    flows_to: [heart.pulmonary_trunk]
+
+- id: heart.pulmonary_trunk
+  mesh_name: Heart_PulmonaryTrunk
+  display_name_en: Pulmonary trunk
+  display_name_ar: الجذع الرئوي
+  aliases: [pulmonary trunk, pulmonary artery, main pulmonary artery, "الشريان الرئوي", "الجذع الرئوي"]
+  relations:
+    connects_to: [heart.pulmonary_valve]
+
+- id: heart.left_atrium
+  mesh_name: Heart_LeftAtrium
+  display_name_en: Left atrium
+  display_name_ar: الأذين الأيسر
+  aliases: [left atrium, la, "l atrium", "الأذين الأيسر"]
+  relations:
+    part_of: [heart.heart]
+    connects_to: [heart.mitral_valve]
+    flows_to: [heart.mitral_valve]
+
+- id: heart.mitral_valve
+  mesh_name: Heart_MitralValve
+  display_name_en: Mitral valve
+  display_name_ar: الصمام التاجي
+  aliases: [mitral valve, mitral, bicuspid valve, left atrioventricular valve, left av valve, "الصمام التاجي", "الصمام ثنائي الشرف"]
+  relations:
+    part_of: [heart.heart]
+    connects_to: [heart.left_atrium, heart.left_ventricle]
+    flows_to: [heart.left_ventricle]
+
+- id: heart.left_ventricle
+  mesh_name: Heart_LeftVentricle
+  display_name_en: Left ventricle
+  display_name_ar: البطين الأيسر
+  aliases: [left ventricle, lv, "l ventricle", "البطين الأيسر"]
+  relations:
+    part_of: [heart.heart]
+    connects_to: [heart.mitral_valve, heart.aortic_valve]
+    flows_to: [heart.aortic_valve]
+
+- id: heart.aortic_valve
+  mesh_name: Heart_AorticValve
+  display_name_en: Aortic valve
+  display_name_ar: الصمام الأبهري
+  aliases: [aortic valve, aortic semilunar valve, "الصمام الأورطي", "الصمام الأبهري"]
+  relations:
+    part_of: [heart.heart]
+    connects_to: [heart.left_ventricle, heart.aorta]
+    flows_to: [heart.aorta]
+
+- id: heart.aorta
+  mesh_name: Heart_Aorta
+  display_name_en: Aorta (ascending aorta and arch)
+  display_name_ar: الشريان الأبهر
+  aliases: [aorta, ascending aorta, aortic arch, arch of aorta, "الأبهر", "الأورطي", "الشريان الأورطي"]
+  relations:
+    connects_to: [heart.aortic_valve, heart.coronary_arteries]
+    flows_to: [heart.coronary_arteries]
+
+- id: heart.coronary_arteries
+  mesh_name: Heart_CoronaryArteries
+  display_name_en: Coronary arteries
+  display_name_ar: الشرايين التاجية
+  aliases: [coronary arteries, coronary artery, lad, left anterior descending, circumflex artery, right coronary artery, rca, lca, "الشرايين التاجية"]
+  relations:
+    part_of: [heart.heart]
+    connects_to: [heart.aorta]
+    supplies: [heart.right_atrium, heart.right_ventricle, heart.left_atrium, heart.left_ventricle]
+
+- id: heart.cardiac_veins
+  mesh_name: Heart_CardiacVeins
+  display_name_en: Cardiac veins and coronary sinus
+  display_name_ar: الأوردة القلبية والجيب التاجي
+  aliases: [cardiac veins, coronary sinus, great cardiac vein, small cardiac vein, "الأوردة القلبية", "الجيب التاجي"]
+  relations:
+    part_of: [heart.heart]
+    connects_to: [heart.right_atrium]
+    flows_to: [heart.right_atrium]
+
+- id: heart.superior_vena_cava
+  mesh_name: Heart_SuperiorVenaCava
+  display_name_en: Superior vena cava
+  display_name_ar: الوريد الأجوف العلوي
+  aliases: [superior vena cava, svc, "الوريد الأجوف العلوي"]
+  relations:
+    connects_to: [heart.right_atrium]
+    flows_to: [heart.right_atrium]
+
+- id: heart.inferior_vena_cava
+  mesh_name: Heart_InferiorVenaCava
+  display_name_en: Inferior vena cava
+  display_name_ar: الوريد الأجوف السفلي
+  aliases: [inferior vena cava, ivc, "الوريد الأجوف السفلي"]
+  relations:
+    connects_to: [heart.right_atrium]
+    flows_to: [heart.right_atrium]

@@ -1,0 +1,20 @@
+- structure_id: spine.cervical_region
+  mesh_name: Spine_Cervical
+  position: "-0.0m 0.6248m 0.0364m"
+  normal: "0.0383 0.0914 0.9951"
+- structure_id: spine.thoracic_region
+  mesh_name: Spine_Thoracic
+  position: "0.0004m 0.386m 0.0207m"
+  normal: "0.0673 0.3159 0.9464"
+- structure_id: spine.lumbar_region
+  mesh_name: Spine_Lumbar
+  position: "-0.0022m 0.2164m 0.061m"
+  normal: "-0.0635 -0.0134 0.9979"
+- structure_id: spine.sacral_region
+  mesh_name: Spine_Sacral
+  position: "-0.0529m 0.0933m 0.0134m"
+  normal: "0.1437 -0.4652 0.8735"
+- structure_id: spine.intervertebral_disc
+  mesh_name: Spine_IntervertebralDiscs
+  position: "0.0007m 0.3183m 0.0426m"
+  normal: "0.0322 -0.5414 0.8401"

@@ -1,0 +1,56 @@
+- structure_id: heart.right_atrium
+  mesh_name: Heart_RightAtrium
+  position: "-0.0278m 0.0787m 0.0495m"
+  normal: "-0.0698 0.0217 0.9973"
+- structure_id: heart.tricuspid_valve
+  mesh_name: Heart_TricuspidValve
+  position: "-0.0013m 0.0457m 0.0417m"
+  normal: "0.0733 0.5554 0.8283"
+- structure_id: heart.right_ventricle
+  mesh_name: Heart_RightVentricle
+  position: "0.0053m 0.0585m 0.0602m"
+  normal: "0.062 -0.0291 0.9977"
+- structure_id: heart.pulmonary_valve
+  mesh_name: Heart_PulmonaryValve
+  position: "0.008m 0.095m 0.0464m"
+  normal: "-0.0682 -0.0237 0.9974"
+- structure_id: heart.pulmonary_trunk
+  mesh_name: Heart_PulmonaryTrunk
+  position: "0.0101m 0.1099m 0.0415m"
+  normal: "0.3063 0.5242 0.7946"
+- structure_id: heart.left_atrium
+  mesh_name: Heart_LeftAtrium
+  position: "0.0298m 0.0842m 0.038m"
+  normal: "0.0273 0.0427 0.9987"
+- structure_id: heart.mitral_valve
+  mesh_name: Heart_MitralValve
+  position: "0.0227m 0.0555m 0.0283m"
+  normal: "-0.2765 0.4793 0.8329"
+- structure_id: heart.left_ventricle
+  mesh_name: Heart_LeftVentricle
+  position: "0.0278m 0.0533m 0.0469m"
+  normal: "0.1105 0.0016 0.9939"
+- structure_id: heart.aortic_valve
+  mesh_name: Heart_AorticValve
+  position: "-0.0041m 0.0851m 0.0193m"
+  normal: "-0.0293 -0.0436 0.9986"
+- structure_id: heart.aorta
+  mesh_name: Heart_Aorta
+  position: "-0.0159m 0.1117m 0.0243m"
+  normal: "-0.0746 -0.0727 0.9946"
+- structure_id: heart.coronary_arteries
+  mesh_name: Heart_CoronaryArteries
+  position: "0.0009m 0.0628m 0.0633m"
+  normal: "-0.0163 0.0531 0.9985"
+- structure_id: heart.cardiac_veins
+  mesh_name: Heart_CardiacVeins
+  position: "-0.0228m 0.0459m 0.0537m"
+  normal: "-0.1669 -0.07 0.9835"
+- structure_id: heart.superior_vena_cava
+  mesh_name: Heart_SuperiorVenaCava
+  position: "-0.0333m 0.1339m 0.0129m"
+  normal: "0.3428 -0.0288 0.939"
+- structure_id: heart.inferior_vena_cava
+  mesh_name: Heart_InferiorVenaCava
+  position: "-0.033m 0.0115m 0.0123m"
+  normal: "0.388 -0.0133 0.9216"

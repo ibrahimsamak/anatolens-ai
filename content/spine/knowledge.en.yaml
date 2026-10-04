@@ -1,0 +1,107 @@
+- structure_id: spine.vertebral_column
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    The vertebral column is formed by 33 vertebrae: 7 cervical, 12 thoracic, 5 lumbar,
+    5 fused sacral and usually 4 fused coccygeal. It supports the head and trunk, transmits
+    body weight to the pelvis, protects the spinal cord within the vertebral canal, and
+    allows movement of the trunk.
+
+- structure_id: spine.vertebral_column
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    The adult vertebral column has four curvatures. The thoracic and sacral curvatures are
+    primary curvatures (kyphoses), concave anteriorly and present from fetal life. The cervical
+    and lumbar curvatures are secondary curvatures (lordoses), concave posteriorly, developing
+    as the infant holds up its head and begins to stand and walk.
+
+- structure_id: spine.cervical_region
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    The cervical region has seven vertebrae (C1-C7), the smallest movable vertebrae. Each has a
+    foramen transversarium in its transverse process; those of C1-C6 transmit the vertebral
+    artery. C1 (atlas) has no body and carries the skull, permitting nodding at the
+    atlanto-occipital joints. C2 (axis) has the dens, around which the atlas rotates to turn the head.
+
+- structure_id: spine.thoracic_region
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    The thoracic region has twelve vertebrae (T1-T12). Their defining feature is costal facets
+    on the bodies and transverse processes, which articulate with the ribs. Long spinous
+    processes slope downward and overlap. Movement is limited by the rib cage and sternum,
+    although rotation is relatively free.
+
+- structure_id: spine.lumbar_region
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    The lumbar region consists of five vertebrae (L1-L5), the largest movable vertebrae. They
+    bear most of the body's weight and allow flexion and extension of the lower back, with
+    little rotation. They have large kidney-shaped bodies and short, thick, hatchet-shaped
+    spinous processes, and they lack foramina transversaria and costal facets.
+
+- structure_id: spine.lumbar_region
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    In adults the spinal cord usually ends at about the L1-L2 level (conus medullaris). Below
+    this the vertebral canal contains the cauda equina, so lumbar puncture is performed between
+    L3 and L4 or between L4 and L5, away from the cord.
+
+- structure_id: spine.sacral_region
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    The sacrum is a triangular bone formed by the fusion of five sacral vertebrae (S1-S5). It
+    articulates superiorly with L5 at the lumbosacral joint, laterally with the ilia at the
+    sacroiliac joints, and inferiorly with the coccyx. It transmits body weight to the pelvic
+    girdle. Anterior and posterior sacral foramina transmit the rami of the sacral spinal nerves.
+
+- structure_id: spine.coccygeal_region
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    The coccyx (tailbone) is a small triangular bone usually formed by four fused rudimentary
+    vertebrae, although three to five occur. It articulates with the apex of the sacrum. It gives
+    attachment to parts of the gluteus maximus and coccygeus muscles and to the anococcygeal
+    ligament, and it supports the pelvic floor.
+
+- structure_id: spine.intervertebral_disc
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    Intervertebral discs join adjacent vertebral bodies from C2-C3 down to L5-S1. There is no
+    disc between the skull and C1 or between C1 and C2. Each disc has an outer annulus fibrosus
+    of fibrocartilage lamellae and an inner gelatinous nucleus pulposus. Together they absorb
+    shock and allow movement. Discs make up about a quarter of the length of the presacral column.
+
+- structure_id: spine.intervertebral_disc
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    A herniated disc occurs when the nucleus pulposus protrudes through a tear in the annulus
+    fibrosus, usually posterolaterally, where it can compress a spinal nerve root. Herniations
+    are most common in the lower lumbar region (L4-L5 and L5-S1).

@@ -1,0 +1,171 @@
+- structure_id: heart.heart
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    The heart is a muscular pump in the middle mediastinum, enclosed in the pericardium. It has
+    four chambers: two atria that receive blood and two ventricles that pump it out. The right
+    side pumps deoxygenated blood to the lungs (pulmonary circulation). The left side pumps
+    oxygenated blood to the body (systemic circulation).
+
+- structure_id: heart.heart
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    Blood flows through the heart in this order: venae cavae, right atrium, tricuspid valve,
+    right ventricle, pulmonary valve, pulmonary trunk, lungs, pulmonary veins, left atrium,
+    mitral valve, left ventricle, aortic valve, aorta. The four valves keep this flow in one direction.
+
+- structure_id: heart.right_atrium
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    The right atrium receives deoxygenated blood from the superior vena cava, the inferior vena
+    cava and the coronary sinus, and passes it through the tricuspid valve to the right ventricle.
+    Its wall contains the sinoatrial (SA) node, the heart's natural pacemaker. The fossa ovalis
+    on the interatrial septum is the remnant of the fetal foramen ovale.
+
+- structure_id: heart.right_ventricle
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    The right ventricle forms most of the anterior surface of the heart. It pumps deoxygenated
+    blood through the pulmonary valve into the pulmonary trunk. Its wall is thinner than the
+    left ventricle's because the pulmonary circulation is a low-pressure system. Its interior
+    has trabeculae carneae, papillary muscles and the septomarginal trabecula (moderator band).
+
+- structure_id: heart.left_atrium
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    The left atrium forms most of the base (posterior surface) of the heart. It receives
+    oxygenated blood from the lungs, usually through four pulmonary veins, and passes it through
+    the mitral valve to the left ventricle. Its close relation to the esophagus is the basis of
+    transesophageal echocardiography.
+
+- structure_id: heart.left_ventricle
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    The left ventricle forms the apex of the heart and most of its left (pulmonary) surface. It
+    has the thickest wall of the four chambers, typically two to three times thicker than the
+    right ventricle's, because it pumps oxygenated blood through the aortic valve into the high-pressure
+    systemic circulation.
+
+- structure_id: heart.tricuspid_valve
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    The tricuspid (right atrioventricular) valve lies between the right atrium and the right
+    ventricle. It has three leaflets (anterior, posterior and septal), anchored by chordae
+    tendineae to papillary muscles. These stop the leaflets everting into the atrium when the
+    ventricle contracts.
+
+- structure_id: heart.mitral_valve
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    The mitral (bicuspid, left atrioventricular) valve lies between the left atrium and the left
+    ventricle. It has two leaflets, anterior and posterior, held by chordae tendineae attached to
+    the anterolateral and posteromedial papillary muscles. It closes during ventricular systole
+    to prevent backflow into the left atrium.
+
+- structure_id: heart.pulmonary_valve
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    The pulmonary valve is a semilunar valve with three cusps at the junction of the right
+    ventricle and the pulmonary trunk. It opens during ventricular systole and closes during
+    diastole, preventing blood from returning to the right ventricle.
+
+- structure_id: heart.aortic_valve
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    The aortic valve is a semilunar valve with three cusps (right, left and posterior) between
+    the left ventricle and the ascending aorta. Above the cusps are the aortic sinuses; the right
+    and left coronary arteries arise from the right and left aortic sinuses.
+
+- structure_id: heart.aorta
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    The aorta is the main artery of the systemic circulation. It begins at the aortic valve as
+    the ascending aorta, whose only branches are the coronary arteries. It continues as the arch
+    of the aorta, which gives off the brachiocephalic trunk, the left common carotid artery and
+    the left subclavian artery, and then descends as the descending (thoracic) aorta.
+
+- structure_id: heart.pulmonary_trunk
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    The pulmonary trunk carries deoxygenated blood from the right ventricle and divides into the
+    right and left pulmonary arteries, which run to the lungs. The ligamentum arteriosum, the
+    remnant of the fetal ductus arteriosus, connects the left pulmonary artery to the arch of the aorta.
+
+- structure_id: heart.coronary_arteries
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    The right and left coronary arteries supply the myocardium. The left coronary artery divides
+    into the anterior interventricular (left anterior descending) branch and the circumflex
+    branch. The right coronary artery usually supplies the SA and AV nodes and, in most people,
+    gives off the posterior interventricular branch. Blockage of a coronary artery can cause a
+    myocardial infarction.
+
+- structure_id: heart.cardiac_veins
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    Most blood from the myocardium returns through cardiac veins that drain into the coronary
+    sinus, which runs in the posterior part of the coronary sulcus and opens into the right
+    atrium. Its main tributaries are the great, middle and small cardiac veins. Anterior cardiac
+    veins drain directly into the right atrium.
+
+- structure_id: heart.superior_vena_cava
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    The superior vena cava returns deoxygenated blood from the head, neck, upper limbs and most of
+    the thoracic wall to the right atrium. It is formed by the union of the right and left
+    brachiocephalic veins and receives the azygos vein before entering the atrium.
+
+- structure_id: heart.inferior_vena_cava
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    The inferior vena cava returns deoxygenated blood from the lower limbs, pelvis and abdomen to
+    the right atrium. It is formed by the union of the common iliac veins and passes through the
+    caval opening of the diaphragm at about the level of T8. The model shows only its short
+    terminal segment entering the right atrium.
