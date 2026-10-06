@@ -37,6 +37,8 @@ class KnowledgeChunk(Base):
     text: Mapped[str] = mapped_column(Text)
     review_status: Mapped[str] = mapped_column(String, default="DRAFT")
     source: Mapped[str] = mapped_column(String, default="")
+    source_version: Mapped[str] = mapped_column(String, default="")
+    reviewer: Mapped[str | None] = mapped_column(String, nullable=True)
     embedding: Mapped[list[float]] = mapped_column(Vector(1536))
 
 class ScanSession(Base):

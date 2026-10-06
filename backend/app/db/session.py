@@ -6,4 +6,4 @@ from app.core.config import sqlalchemy_database_url
 def get_engine():
     return create_engine(sqlalchemy_database_url(),pool_pre_ping=True)
 
-sessionLocal = sessionmaker(bind=get_engine(), autoflush=False, expire_on_commit=False)
+SessionLocal = sessionmaker(bind=get_engine(), autoflush=False, expire_on_commit=False)
