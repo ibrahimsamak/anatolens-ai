@@ -21,6 +21,7 @@ pillow
 pyyaml
 structlog
 sse-starlette
+strawberry-graphql[fastapi]
 pytest
 pytest-asyncio
 httpx
