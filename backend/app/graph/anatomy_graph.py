@@ -35,10 +35,12 @@ class AnatomyGraph:
         return seen
 
 
-def build_graph(structures_yaml_path: str) -> AnatomyGraph:
+def build_graph(*structures_yaml_paths: str) -> AnatomyGraph:
     g = Graph()
-    with open(structures_yaml_path, encoding="utf-8") as f:
-        data = yaml.safe_load(f)
+    data = []
+    for path in structures_yaml_paths:
+        with open(path, encoding="utf-8") as f:
+            data += yaml.safe_load(f) or []
     for s in data:
         subj = URIRef(NS + s["id"])
         for rel, targets in (s.get("relations") or {}).items():
