@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AnatoLens Demo</title>
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+<body>
+  <header>
+    <h1>AnatoLens <span id="lesson-title"></span></h1>
+    <button id="ar-btn" type="button" hidden></button>
+  </header>
+  <main>
+    <section id="stage">
+      <video id="camera" playsinline muted hidden></video>
+      <model-viewer id="mv" camera-controls touch-action="pan-y" shadow-intensity="0.6"
+          ar ar-modes="webxr scene-viewer quick-look" interaction-prompt="none" alt="3D anatomy model">
+        <button slot="ar-button" hidden></button>
+      </model-viewer>
+      <p id="lesson-status" role="status">Loading lesson…</p>
+    </section>
+    <section id="side">
+      <h2>Structures</h2>
+      <div id="panel" class="chips"></div>
+      <form id="ask" hidden>
+        <label for="question">Ask about <b id="ask-target"></b></label>
+        <div class="row">
+          <input id="question" placeholder="e.g. what does it do?" autocomplete="off">
+          <button type="submit">Ask</button>
+        </div>
+      </form>
+      <article id="card" hidden aria-live="polite">
+        <h3 id="card-title"></h3>
+        <p id="card-text"></p>
+        <small id="card-meta"></small>
+      </article>
+    </section>
+  </main>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
