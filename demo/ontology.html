@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AnatoLens Ontology</title>
+<style>
+:root {
+  --bg: #f6f5f1; --surface: #ffffff; --ink: #1d1f24; --muted: #6b6f78; --line: #dcdad3;
+  --node: #ffffff; --node-ink: #1d1f24; --accent: #c2410c; --accent-soft: #fde7da;
+  --rel-part_of: #8a8f99; --rel-connects_to: #2f6fb3; --rel-flows_to: #c0392b; --rel-supplies: #7a4fb8;
+  --rel-other: #3f8f6b; --ok: #2f7d4f; --warn: #b26b00;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121418; --surface: #1b1e24; --ink: #e8e9ec; --muted: #9aa0ab; --line: #2c3038;
+    --node: #23272f; --node-ink: #e8e9ec; --accent: #ff8a4c; --accent-soft: #3a2418;
+    --rel-part_of: #7d838e; --rel-connects_to: #5b9be0; --rel-flows_to: #ef6b5b; --rel-supplies: #a884e0;
+    --rel-other: #5cc095; --ok: #5cc08a; --warn: #e0a040;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121418; --surface: #1b1e24; --ink: #e8e9ec; --muted: #9aa0ab; --line: #2c3038;
+  --node: #23272f; --node-ink: #e8e9ec; --accent: #ff8a4c; --accent-soft: #3a2418;
+  --rel-part_of: #7d838e; --rel-connects_to: #5b9be0; --rel-flows_to: #ef6b5b; --rel-supplies: #a884e0;
+  --rel-other: #5cc095; --ok: #5cc08a; --warn: #e0a040;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: var(--bg); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
+       display: flex; flex-direction: column; }
+header { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; padding: 12px 16px;
+         border-bottom: 1px solid var(--line); background: var(--surface); }
+h1 { font-size: 16px; margin: 0; letter-spacing: .01em; }
+h1 span { color: var(--muted); font-weight: 400; }
+.group { display: flex; gap: 4px; align-items: center; }
+.group label { color: var(--muted); font-size: 12px; margin-right: 4px; }
+button { font: inherit; font-size: 13px; color: var(--ink); background: transparent; border: 1px solid var(--line);
+         border-radius: 6px; padding: 4px 10px; cursor: pointer; }
+button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+button:focus-visible, .node:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+main { flex: 1; display: flex; min-height: 0; }
+#stage { flex: 1; position: relative; min-width: 0; }
+svg { width: 100%; height: 100%; display: block; touch-action: none; user-select: none; }
+#legend { position: absolute; left: 16px; bottom: 16px; display: flex; flex-wrap: wrap; gap: 6px; max-width: calc(100% - 32px); }
+#legend button { display: flex; align-items: center; gap: 6px; background: var(--surface); }
+#legend button[aria-pressed="false"] { opacity: .45; }
+#legend i { width: 18px; height: 0; border-top: 2px solid; display: inline-block; }
+#hint { position: absolute; left: 16px; top: 12px; color: var(--muted); font-size: 12px; }
+aside { width: 340px; border-left: 1px solid var(--line); background: var(--surface); overflow-y: auto; padding: 16px; }
+aside h2 { font-size: 17px; margin: 0 0 2px; }
+aside .ar { direction: rtl; color: var(--muted); margin: 0 0 10px; }
+aside h3 { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 18px 0 6px; }
+.mono { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: 12px; }
+.chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.chip { border: 1px solid var(--line); border-radius: 999px; padding: 1px 8px; font-size: 12px; }
+ul.rels { list-style: none; padding: 0; margin: 0; }
+ul.rels li { padding: 3px 0; display: flex; gap: 8px; align-items: baseline; }
+ul.rels .rel { font-size: 11px; min-width: 82px; }
+a.jump { color: var(--ink); cursor: pointer; text-decoration: underline; text-decoration-color: var(--line); }
+pre { background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 10px; margin: 0;
+      white-space: pre-wrap; word-break: break-word; }
+.ok { color: var(--ok); } .warn { color: var(--warn); }
+.empty { color: var(--muted); }
+
+.edge { fill: none; stroke-width: 1.6; opacity: .55; transition: opacity .3s, stroke-width .3s; }
+.flow { fill: none; stroke-width: 2.4; stroke-dasharray: 2 12; stroke-linecap: round; opacity: .9;
+        animation: flow 1.1s linear infinite; pointer-events: none; }
+@keyframes flow { to { stroke-dashoffset: -14; } }
+.node circle { fill: var(--node); stroke: var(--muted); stroke-width: 1.5; transition: stroke .3s, stroke-width .3s, r .3s; }
+.node.nomesh circle { stroke-dasharray: 3 3; }
+.node.root circle { stroke-width: 2.5; }
+.node text { fill: var(--node-ink); font-size: 12px; paint-order: stroke; stroke: var(--bg); stroke-width: 4px;
+             stroke-linejoin: round; pointer-events: none; }
+.node { cursor: pointer; transition: opacity .3s; }
+.node .ring { fill: none; stroke: var(--accent); stroke-width: 2; opacity: 0; }
+svg.selecting .node, svg.selecting .edge { opacity: .14; }
+svg.selecting .flow { opacity: .1; }
+svg.selecting .node.lit { opacity: 1; }
+svg.selecting .edge.lit { opacity: 1; stroke-width: 2.6; }
+.node.lit circle { stroke: var(--accent); stroke-width: 2.5; }
+.node.seed circle { fill: var(--accent-soft); stroke-width: 3; }
+.node.seed .ring { animation: pulse 1.6s ease-out infinite; }
+.node.pop circle { animation: pop .45s ease-out; }
+@keyframes pulse { 0% { opacity: .8; r: 16; } 100% { opacity: 0; r: 40; } }
+@keyframes pop { 0% { r: 12; } 50% { r: 19; } 100% { r: 14; } }
+@media (prefers-reduced-motion: reduce) {
+  .flow, .node.seed .ring, .node.pop circle { animation: none; }
+}
+@media (max-width: 760px) {
+  main { flex-direction: column; }
+  #stage { min-height: 60vh; }
+  aside { width: auto; border-left: 0; border-top: 1px solid var(--line); }
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>AnatoLens ontology <span>· structures.yaml relations</span></h1>
+  <div class="group" id="lessons" role="group" aria-label="Lesson"><label>Lesson</label></div>
+  <div class="group" role="group" aria-label="GraphRAG hops"><label>Hops</label>
+    <button data-hops="1" aria-pressed="true">1</button><button data-hops="2" aria-pressed="false">2</button></div>
+  <div class="group" role="group" aria-label="Label language"><label>Labels</label>
+    <button data-lang="en" aria-pressed="true">EN</button><button data-lang="ar" aria-pressed="false">AR</button></div>
+  <div class="group"><button id="relayout">Re-layout</button></div>
+</header>
+<main>
+  <div id="stage">
+    <svg id="svg" aria-label="Ontology graph"><defs id="defs"></defs><g id="edges"></g><g id="flows"></g><g id="nodes"></g></svg>
+    <div id="hint">Click a structure to animate its GraphRAG seed · drag to move</div>
+    <div id="legend"></div>
+  </div>
+  <aside id="panel"></aside>
+</main>
+<script>
+const DATA = [{"id": "heart_001", "title": "The Heart", "nodes": [{"id": "heart.heart", "en": "Heart", "ar": "القلب", "mesh": null, "aliases": ["heart", "cor", "cardiac", "القلب"], "knowledge": {"ar": {"APPROVED": 2}, "en": {"APPROVED": 2}}}, {"id": "heart.right_atrium", "en": "Right atrium", "ar": "الأذين الأيمن", "mesh": "Heart_RightAtrium", "aliases": ["right atrium", "ra", "r atrium", "الأذين الأيمن"], "knowledge": {"ar": {"APPROVED": 1}, "en": {"APPROVED": 1}}}, {"id": "heart.tricuspid_valve", "en": "Tricuspid valve", "ar": "الصمام ثلاثي الشرف", "mesh": "Heart_TricuspidValve", "aliases": ["tricuspid valve", "tricuspid", "right atrioventricular valve", "right av valve", "الصمام ثلاثي الشرفات"], "knowledge": {"ar": {"APPROVED": 1}, "en": {"APPROVED": 1}}}, {"id": "heart.right_ventricle", "en": "Right ventricle", "ar": "البطين الأيمن", "mesh": "Heart_RightVentricle", "aliases": ["right ventricle", "rv", "r ventricle", "البطين الأيمن"], "knowledge": {"ar": {"APPROVED": 1}, "en": {"APPROVED": 1}}}, {"id": "heart.pulmonary_valve", "en": "Pulmonary valve", "ar": "الصمام الرئوي", "mesh": "Heart_PulmonaryValve", "aliases": ["pulmonary valve", "pulmonic valve", "pulmonary semilunar valve", "الصمام الرئوي"], "knowledge": {"ar": {"APPROVED": 1}, "en": {"APPROVED": 1}}}, {"id": "heart.pulmonary_trunk", "en": "Pulmonary trunk", "ar": "الجذع الرئوي", "mesh": "Heart_PulmonaryTrunk", "aliases": ["pulmonary trunk", "pulmonary artery", "main pulmonary artery", "الشريان الرئوي", "الجذع الرئوي"], "knowledge": {"ar": {"APPROVED": 1}, "en": {"APPROVED": 1}}}, {"id": "heart.left_atrium", "en": "Left atrium", "ar": "الأذين الأيسر", "mesh": "Heart_LeftAtrium", "aliases": ["left atrium", "la", "l atrium", "الأذين الأيسر"], "knowledge": {"ar": {"APPROVED": 1}, "en": {"APPROVED": 1}}}, {"id": "heart.mitral_valve", "en": "Mitral valve", "ar": "الصمام التاجي", "mesh": "Heart_MitralValve", "aliases": ["mitral valve", "mitral", "bicuspid valve", "left atrioventricular valve", "left av valve", "الصمام التاجي", "الصمام ثنائي الشرف"], "knowledge": {"ar": {"APPROVED": 1}, "en": {"APPROVED": 1}}}, {"id": "heart.left_ventricle", "en": "Left ventricle", "ar": "البطين الأيسر", "mesh": "Heart_LeftVentricle", "aliases": ["left ventricle", "lv", "l ventricle", "البطين الأيسر"], "knowledge": {"ar": {"APPROVED": 1}, "en": {"APPROVED": 1}}}, {"id": "heart.aortic_valve", "en": "Aortic valve", "ar": "الصمام الأبهري", "mesh": "Heart_AorticValve", "aliases": ["aortic valve", "aortic semilunar valve", "الصمام الأورطي", "الصمام الأبهري"], "knowledge": {"ar": {"APPROVED": 1}, "en": {"APPROVED": 1}}}, {"id": "heart.aorta", "en": "Aorta (ascending aorta and arch)", "ar": "الشريان الأبهر", "mesh": "Heart_Aorta", "aliases": ["aorta", "ascending aorta", "aortic arch", "arch of aorta", "الأبهر", "الأورطي", "الشريان الأورطي"], "knowledge": {"ar": {"APPROVED": 1}, "en": {"APPROVED": 1}}}, {"id": "heart.coronary_arteries", "en": "Coronary arteries", "ar": "الشرايين التاجية", "mesh": "Heart_CoronaryArteries", "aliases": ["coronary arteries", "coronary artery", "lad", "left anterior descending", "circumflex artery", "right coronary artery", "rca", "lca", "الشرايين التاجية"], "knowledge": {"ar": {"APPROVED": 1}, "en": {"APPROVED": 1}}}, {"id": "heart.cardiac_veins", "en": "Cardiac veins and coronary sinus", "ar": "الأوردة القلبية والجيب التاجي", "mesh": "Heart_CardiacVeins", "aliases": ["cardiac veins", "coronary sinus", "great cardiac vein", "small cardiac vein", "الأوردة القلبية", "الجيب التاجي"], "knowledge": {"ar": {"APPROVED": 1}, "en": {"APPROVED": 1}}}, {"id": "heart.superior_vena_cava", "en": "Superior vena cava", "ar": "الوريد الأجوف العلوي", "mesh": "Heart_SuperiorVenaCava", "aliases": ["superior vena cava", "svc", "الوريد الأجوف العلوي"], "knowledge": {"ar": {"APPROVED": 1}, "en": {"APPROVED": 1}}}, {"id": "heart.inferior_vena_cava", "en": "Inferior vena cava", "ar": "الوريد الأجوف السفلي", "mesh": "Heart_InferiorVenaCava", "aliases": ["inferior vena cava", "ivc", "الوريد الأجوف السفلي"], "knowledge": {"ar": {"APPROVED": 1}, "en": {"APPROVED": 1}}}], "links": [{"s": "heart.right_atrium", "t": "heart.heart", "rel": "part_of"}, {"s": "heart.right_atrium", "t": "heart.superior_vena_cava", "rel": "connects_to"}, {"s": "heart.right_atrium", "t": "heart.inferior_vena_cava", "rel": "connects_to"}, {"s": "heart.right_atrium", "t": "heart.tricuspid_valve", "rel": "connects_to"}, {"s": "heart.right_atrium", "t": "heart.cardiac_veins", "rel": "connects_to"}, {"s": "heart.right_atrium", "t": "heart.tricuspid_valve", "rel": "flows_to"}, {"s": "heart.tricuspid_valve", "t": "heart.heart", "rel": "part_of"}, {"s": "heart.tricuspid_valve", "t": "heart.right_atrium", "rel": "connects_to"}, {"s": "heart.tricuspid_valve", "t": "heart.right_ventricle", "rel": "connects_to"}, {"s": "heart.tricuspid_valve", "t": "heart.right_ventricle", "rel": "flows_to"}, {"s": "heart.right_ventricle", "t": "heart.heart", "rel": "part_of"}, {"s": "heart.right_ventricle", "t": "heart.tricuspid_valve", "rel": "connects_to"}, {"s": "heart.right_ventricle", "t": "heart.pulmonary_valve", "rel": "connects_to"}, {"s": "heart.right_ventricle", "t": "heart.pulmonary_valve", "rel": "flows_to"}, {"s": "heart.pulmonary_valve", "t": "heart.heart", "rel": "part_of"}, {"s": "heart.pulmonary_valve", "t": "heart.right_ventricle", "rel": "connects_to"}, {"s": "heart.pulmonary_valve", "t": "heart.pulmonary_trunk", "rel": "connects_to"}, {"s": "heart.pulmonary_valve", "t": "heart.pulmonary_trunk", "rel": "flows_to"}, {"s": "heart.pulmonary_trunk", "t": "heart.pulmonary_valve", "rel": "connects_to"}, {"s": "heart.left_atrium", "t": "heart.heart", "rel": "part_of"}, {"s": "heart.left_atrium", "t": "heart.mitral_valve", "rel": "connects_to"}, {"s": "heart.left_atrium", "t": "heart.mitral_valve", "rel": "flows_to"}, {"s": "heart.mitral_valve", "t": "heart.heart", "rel": "part_of"}, {"s": "heart.mitral_valve", "t": "heart.left_atrium", "rel": "connects_to"}, {"s": "heart.mitral_valve", "t": "heart.left_ventricle", "rel": "connects_to"}, {"s": "heart.mitral_valve", "t": "heart.left_ventricle", "rel": "flows_to"}, {"s": "heart.left_ventricle", "t": "heart.heart", "rel": "part_of"}, {"s": "heart.left_ventricle", "t": "heart.mitral_valve", "rel": "connects_to"}, {"s": "heart.left_ventricle", "t": "heart.aortic_valve", "rel": "connects_to"}, {"s": "heart.left_ventricle", "t": "heart.aortic_valve", "rel": "flows_to"}, {"s": "heart.aortic_valve", "t": "heart.heart", "rel": "part_of"}, {"s": "heart.aortic_valve", "t": "heart.left_ventricle", "rel": "connects_to"}, {"s": "heart.aortic_valve", "t": "heart.aorta", "rel": "connects_to"}, {"s": "heart.aortic_valve", "t": "heart.aorta", "rel": "flows_to"}, {"s": "heart.aorta", "t": "heart.aortic_valve", "rel": "connects_to"}, {"s": "heart.aorta", "t": "heart.coronary_arteries", "rel": "connects_to"}, {"s": "heart.aorta", "t": "heart.coronary_arteries", "rel": "flows_to"}, {"s": "heart.coronary_arteries", "t": "heart.heart", "rel": "part_of"}, {"s": "heart.coronary_arteries", "t": "heart.aorta", "rel": "connects_to"}, {"s": "heart.coronary_arteries", "t": "heart.right_atrium", "rel": "supplies"}, {"s": "heart.coronary_arteries", "t": "heart.right_ventricle", "rel": "supplies"}, {"s": "heart.coronary_arteries", "t": "heart.left_atrium", "rel": "supplies"}, {"s": "heart.coronary_arteries", "t": "heart.left_ventricle", "rel": "supplies"}, {"s": "heart.cardiac_veins", "t": "heart.heart", "rel": "part_of"}, {"s": "heart.cardiac_veins", "t": "heart.right_atrium", "rel": "connects_to"}, {"s": "heart.cardiac_veins", "t": "heart.right_atrium", "rel": "flows_to"}, {"s": "heart.superior_vena_cava", "t": "heart.right_atrium", "rel": "connects_to"}, {"s": "heart.superior_vena_cava", "t": "heart.right_atrium", "rel": "flows_to"}, {"s": "heart.inferior_vena_cava", "t": "heart.right_atrium", "rel": "connects_to"}, {"s": "heart.inferior_vena_cava", "t": "heart.right_atrium", "rel": "flows_to"}]}, {"id": "spine_001", "title": "Vertebral Column", "nodes": [{"id": "spine.vertebral_column", "en": "Vertebral column", "ar": "العمود الفقري", "mesh": null, "aliases": ["spine", "spinal column", "backbone", "vertebral column", "العمود الفقري"], "knowledge": {"ar": {"APPROVED": 2}, "en": {"APPROVED": 2}}}, {"id": "spine.cervical_region", "en": "Cervical region (C1-C7)", "ar": "المنطقة العنقية", "mesh": "Spine_Cervical", "aliases": ["cervical", "cervical spine", "c1-c7", "neck vertebrae", "cervical vertebrae", "atlas", "axis", "الفقرات العنقية"], "knowledge": {"ar": {"APPROVED": 1}, "en": {"APPROVED": 1}}}, {"id": "spine.thoracic_region", "en": "Thoracic region (T1-T12)", "ar": "المنطقة الصدرية", "mesh": "Spine_Thoracic", "aliases": ["thoracic", "thoracic spine", "t1-t12", "dorsal spine", "thoracic vertebrae", "الفقرات الصدرية"], "knowledge": {"ar": {"APPROVED": 1}, "en": {"APPROVED": 1}}}, {"id": "spine.lumbar_region", "en": "Lumbar region (L1-L5)", "ar": "المنطقة القطنية", "mesh": "Spine_Lumbar", "aliases": ["lumbar", "lumbar spine", "l1-l5", "lmbr", "lower back vertebrae", "lumbar vertebrae", "الفقرات القطنية"], "knowledge": {"ar": {"APPROVED": 2}, "en": {"APPROVED": 2}}}, {"id": "spine.sacral_region", "en": "Sacrum (S1-S5)", "ar": "العجز", "mesh": "Spine_Sacral", "aliases": ["sacrum", "sacral", "sacral region", "s1-s5", "sacral vertebrae", "العظم العجزي", "المنطقة العجزية"], "knowledge": {"ar": {"APPROVED": 1}, "en": {"APPROVED": 1}}}, {"id": "spine.coccygeal_region", "en": "Coccyx", "ar": "العصعص", "mesh": null, "aliases": ["coccyx", "coccygeal", "coccygeal region", "tailbone", "المنطقة العصعصية"], "knowledge": {"ar": {"APPROVED": 1}, "en": {"APPROVED": 1}}}, {"id": "spine.intervertebral_disc", "en": "Intervertebral discs", "ar": "الأقراص بين الفقرات", "mesh": "Spine_IntervertebralDiscs", "aliases": ["intervertebral disc", "intervertebral discs", "disc", "disk", "spinal disc", "nucleus pulposus", "annulus fibrosus", "القرص الفقري", "الغضروف بين الفقرات"], "knowledge": {"ar": {"APPROVED": 2}, "en": {"APPROVED": 2}}}], "links": [{"s": "spine.cervical_region", "t": "spine.vertebral_column", "rel": "part_of"}, {"s": "spine.cervical_region", "t": "spine.thoracic_region", "rel": "connects_to"}, {"s": "spine.thoracic_region", "t": "spine.vertebral_column", "rel": "part_of"}, {"s": "spine.thoracic_region", "t": "spine.cervical_region", "rel": "connects_to"}, {"s": "spine.thoracic_region", "t": "spine.lumbar_region", "rel": "connects_to"}, {"s": "spine.lumbar_region", "t": "spine.vertebral_column", "rel": "part_of"}, {"s": "spine.lumbar_region", "t": "spine.thoracic_region", "rel": "connects_to"}, {"s": "spine.lumbar_region", "t": "spine.sacral_region", "rel": "connects_to"}, {"s": "spine.sacral_region", "t": "spine.vertebral_column", "rel": "part_of"}, {"s": "spine.sacral_region", "t": "spine.lumbar_region", "rel": "connects_to"}, {"s": "spine.sacral_region", "t": "spine.coccygeal_region", "rel": "connects_to"}, {"s": "spine.coccygeal_region", "t": "spine.vertebral_column", "rel": "part_of"}, {"s": "spine.coccygeal_region", "t": "spine.sacral_region", "rel": "connects_to"}, {"s": "spine.intervertebral_disc", "t": "spine.vertebral_column", "rel": "part_of"}, {"s": "spine.intervertebral_disc", "t": "spine.cervical_region", "rel": "connects_to"}, {"s": "spine.intervertebral_disc", "t": "spine.thoracic_region", "rel": "connects_to"}, {"s": "spine.intervertebral_disc", "t": "spine.lumbar_region", "rel": "connects_to"}]}];
+const REL_LABEL = { part_of: "part of", connects_to: "connects to", flows_to: "flows to", supplies: "supplies" };
+const DIRECTED = new Set(["part_of", "flows_to", "supplies"]);
+const R = 14, STEP_MS = 420;
+const $ = s => document.querySelector(s);
+const NS = "http://www.w3.org/2000/svg";
+const el = (tag, attrs = {}, parent) => {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (parent) parent.appendChild(e);
+  return e;
+};
+const relVar = rel => REL_LABEL[rel] ? `var(--rel-${rel})` : "var(--rel-other)";
+const svg = $("#svg");
+
+let lesson, nodes, byId, links, edges, hidden = new Set(), hops = 1, lang = "en", selected = null;
+let alpha = 0, raf = 0, timers = [];
+
+function load(idx) {
+  lesson = DATA[idx];
+  document.querySelectorAll("#lessons button").forEach((b, i) => b.setAttribute("aria-pressed", i === idx));
+  const { width, height } = svg.getBoundingClientRect();
+  nodes = lesson.nodes.map((n, i) => {
+    const a = (i / lesson.nodes.length) * Math.PI * 2;
+    return { ...n, x: width / 2 + Math.cos(a) * 160 + Math.random() * 10, y: height / 2 + Math.sin(a) * 160, vx: 0, vy: 0 };
+  });
+  byId = Object.fromEntries(nodes.map(n => [n.id, n]));
+  const seen = new Set();
+  links = lesson.links.filter(l => byId[l.s] && byId[l.t]).filter(l => {
+    const key = DIRECTED.has(l.rel) ? `${l.rel}|${l.s}|${l.t}` : `${l.rel}|${[l.s, l.t].sort().join("|")}`;
+    return !seen.has(key) && seen.add(key);
+  });
+  const inbound = {};
+  links.forEach(l => { if (l.rel === "part_of") inbound[l.t] = (inbound[l.t] || 0) + 1; });
+  nodes.forEach(n => n.root = (inbound[n.id] || 0) > 2);
+  const pairs = {};
+  links.forEach(l => (pairs[[l.s, l.t].sort().join("|")] ||= []).push(l));
+  Object.values(pairs).forEach(g => g.forEach((l, i) => l.bend = (i - (g.length - 1) / 2) * 34 * (l.s < l.t ? 1 : -1)));
+  render();
+  select(null);
+  kick(1);
+}
+
+function render() {
+  const defs = $("#defs"), ge = $("#edges"), gf = $("#flows"), gn = $("#nodes");
+  defs.innerHTML = ge.innerHTML = gf.innerHTML = gn.innerHTML = "";
+  const rels = [...new Set(links.map(l => l.rel))];
+  rels.forEach(rel => {
+    const m = el("marker", { id: `arrow-${rel}`, viewBox: "0 0 10 10", refX: 9, refY: 5, markerWidth: 7, markerHeight: 7, orient: "auto-start-reverse" }, defs);
+    el("path", { d: "M0,0 L10,5 L0,10 z", style: `fill:${relVar(rel)}` }, m);
+  });
+  links.forEach(l => {
+    l.path = el("path", { class: "edge", style: `stroke:${relVar(l.rel)}` }, ge);
+    if (DIRECTED.has(l.rel)) l.path.setAttribute("marker-end", `url(#arrow-${l.rel})`);
+    if (l.rel === "part_of") l.path.setAttribute("stroke-dasharray", "5 4");
+    l.flow = l.rel === "flows_to" ? el("path", { class: "flow", style: `stroke:${relVar(l.rel)}` }, gf) : null;
+    const t = el("title", {}, l.path); t.textContent = `${byId[l.s].en} ${REL_LABEL[l.rel] || l.rel} ${byId[l.t].en}`;
+  });
+  nodes.forEach(n => {
+    n.g = el("g", { class: `node${n.mesh ? "" : " nomesh"}${n.root ? " root" : ""}`, tabindex: 0, role: "button",
+                    "aria-label": n.en }, gn);
+    el("circle", { class: "ring", r: 16 }, n.g);
+    el("circle", { r: n.root ? 18 : R }, n.g);
+    n.label = el("text", { y: (n.root ? 18 : R) + 15, "text-anchor": "middle" }, n.g);
+    n.g.addEventListener("pointerdown", e => startDrag(e, n));
+    n.g.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); select(n.id); } });
+  });
+  setLabels();
+  legend(rels);
+}
+
+function setLabels() {
+  nodes.forEach(n => {
+    n.label.textContent = lang === "ar" && n.ar ? n.ar : n.en;
+    n.label.setAttribute("direction", lang === "ar" ? "rtl" : "ltr");
+  });
+}
+
+function legend(rels) {
+  const box = $("#legend"); box.innerHTML = "";
+  rels.forEach(rel => {
+    const b = document.createElement("button");
+    b.setAttribute("aria-pressed", !hidden.has(rel));
+    b.innerHTML = `<i style="border-color:${relVar(rel)};${rel === "part_of" ? "border-top-style:dashed" : ""}"></i>${REL_LABEL[rel] || rel}`;
+    b.onclick = () => { hidden.has(rel) ? hidden.delete(rel) : hidden.add(rel); b.setAttribute("aria-pressed", !hidden.has(rel)); applyHidden(); };
+    box.appendChild(b);
+  });
+  applyHidden();
+}
+function applyHidden() {
+  links.forEach(l => { const d = hidden.has(l.rel) ? "none" : ""; l.path.style.display = d; if (l.flow) l.flow.style.display = d; });
+}
+
+function kick(a = .5) { alpha = Math.max(alpha, a); if (!raf) raf = requestAnimationFrame(frame); }
+function frame() {
+  const { width, height } = svg.getBoundingClientRect();
+  for (let i = 0; i < nodes.length; i++) for (let j = i + 1; j < nodes.length; j++) {
+    const a = nodes[i], b = nodes[j];
+    let dx = b.x - a.x, dy = b.y - a.y, d2 = Math.max(dx * dx + dy * dy, 80);
+    const f = 5200 / d2, d = Math.sqrt(d2);
+    dx /= d; dy /= d;
+    a.vx -= dx * f; a.vy -= dy * f; b.vx += dx * f; b.vy += dy * f;
+  }
+  links.forEach(l => {
+    const a = byId[l.s], b = byId[l.t];
+    const dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy) || 1;
+    const rest = l.rel === "part_of" ? 170 : 115, f = (d - rest) * .035;
+    a.vx += dx / d * f; a.vy += dy / d * f; b.vx -= dx / d * f; b.vy -= dy / d * f;
+  });
+  nodes.forEach(n => {
+    n.vx += (width / 2 - n.x) * .006; n.vy += (height / 2 - n.y) * .006;
+    if (n.fixed) { n.vx = n.vy = 0; return; }
+    n.vx *= .78; n.vy *= .78;
+    n.x = Math.min(width - 30, Math.max(30, n.x + n.vx * alpha));
+    n.y = Math.min(height - 40, Math.max(30, n.y + n.vy * alpha));
+  });
+  draw();
+  alpha *= .985;
+  raf = alpha > .02 ? requestAnimationFrame(frame) : 0;
+}
+
+function draw() {
+  nodes.forEach(n => n.g.setAttribute("transform", `translate(${n.x},${n.y})`));
+  links.forEach(l => {
+    const a = byId[l.s], b = byId[l.t];
+    const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2, dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy) || 1;
+    const cx = mx - dy / d * l.bend, cy = my + dx / d * l.bend;
+    const ra = (a.root ? 18 : R) + 2, rb = (b.root ? 18 : R) + 4;
+    const ua = Math.hypot(cx - a.x, cy - a.y) || 1, ub = Math.hypot(cx - b.x, cy - b.y) || 1;
+    const d_ = `M${a.x + (cx - a.x) / ua * ra},${a.y + (cy - a.y) / ua * ra} Q${cx},${cy} ${b.x + (cx - b.x) / ub * rb},${b.y + (cy - b.y) / ub * rb}`;
+    l.path.setAttribute("d", d_);
+    if (l.flow) l.flow.setAttribute("d", d_);
+  });
+}
+
+function toSvg(e) { const p = svg.createSVGPoint(); p.x = e.clientX; p.y = e.clientY; return p.matrixTransform(svg.getScreenCTM().inverse()); }
+function startDrag(e, n) {
+  e.stopPropagation();
+  const start = toSvg(e); let moved = false;
+  n.g.setPointerCapture(e.pointerId);
+  const move = ev => {
+    const p = toSvg(ev);
+    if (!moved && Math.hypot(p.x - start.x, p.y - start.y) < 4) return;
+    moved = true; n.fixed = true; n.x = p.x; n.y = p.y; kick(.3); draw();
+  };
+  const up = () => {
+    n.g.removeEventListener("pointermove", move); n.g.removeEventListener("pointerup", up);
+    n.fixed = false;
+    if (!moved) select(n.id);
+  };
+  n.g.addEventListener("pointermove", move); n.g.addEventListener("pointerup", up);
+}
+svg.addEventListener("pointerdown", () => select(null));
+
+function levels(start, maxHops) {
+  const lvl = { [start]: 0 }, q = [start];
+  while (q.length) {
+    const cur = q.shift();
+    if (lvl[cur] >= maxHops) continue;
+    links.forEach(l => {
+      const other = l.s === cur ? l.t : l.t === cur ? l.s : null;
+      if (other && !(other in lvl)) { lvl[other] = lvl[cur] + 1; q.push(other); }
+    });
+  }
+  return lvl;
+}
+
+function select(id) {
+  timers.forEach(clearTimeout); timers = [];
+  selected = id;
+  nodes.forEach(n => n.g.classList.remove("lit", "seed", "pop"));
+  links.forEach(l => l.path.classList.remove("lit"));
+  svg.classList.toggle("selecting", !!id);
+  panel();
+  if (!id) return;
+  const lvl = levels(id, hops);
+  for (let h = 0; h <= hops; h++) {
+    timers.push(setTimeout(() => {
+      nodes.filter(n => lvl[n.id] === h).forEach(n => {
+        n.g.classList.add("lit", "pop"); if (h === 0) n.g.classList.add("seed");
+      });
+      links.filter(l => l.s in lvl && l.t in lvl && Math.max(lvl[l.s], lvl[l.t]) === h && Math.abs(lvl[l.s] - lvl[l.t]) === 1)
+           .forEach(l => l.path.classList.add("lit"));
+    }, h * STEP_MS));
+  }
+}
+
+function kn(n, locale) {
+  const k = (n.knowledge || {})[locale] || {};
+  return { approved: k.APPROVED || 0, other: Object.entries(k).filter(([s]) => s !== "APPROVED") };
+}
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]); }
+function relRow(rel, other, arrow) {
+  return `<li><span class="rel mono" style="color:${relVar(rel)}">${arrow} ${esc(REL_LABEL[rel] || rel)}</span>
+          <a class="jump" data-id="${esc(other.id)}">${esc(other.en)}</a></li>`;
+}
+
+function panel() {
+  const p = $("#panel");
+  if (!selected) {
+    const locales = [...new Set(nodes.flatMap(n => Object.keys(n.knowledge || {})))].sort();
+    p.innerHTML = `<h2>${esc(lesson.title)}</h2><p class="ar mono" style="direction:ltr">${esc(lesson.id)}</p>
+      <p>${nodes.length} structures · ${links.length} relations</p>
+      <h3>How to read it</h3>
+      <ul class="rels">
+        <li>Dashed node: <span class="mono">mesh_name: null</span> (no hotspot in the 3D model)</li>
+        <li>Animated dots: <span class="mono">flows_to</span> direction</li>
+        <li>Click a structure to replay <span class="mono">graph.neighbors(id, hops)</span>: the seed lights up, then each hop.</li>
+      </ul>
+      <h3>Approved knowledge coverage</h3>
+      <ul class="rels">${locales.map(loc => {
+        const covered = nodes.filter(n => kn(n, loc).approved > 0).length;
+        return `<li><span class="rel mono">${loc}</span>${covered}/${nodes.length} structures</li>`;
+      }).join("") || '<li class="empty">No knowledge packs found</li>'}</ul>`;
+    return;
+  }
+  const n = byId[selected];
+  const out = links.filter(l => l.s === n.id), inc = links.filter(l => l.t === n.id);
+  const lvl = levels(n.id, hops);
+  const seed = Object.keys(lvl).sort((a, b) => lvl[a] - lvl[b]);
+  const locales = [...new Set(nodes.flatMap(x => Object.keys(x.knowledge || {})))].sort();
+  const seedApproved = loc => seed.reduce((s, id) => s + kn(byId[id], loc).approved, 0);
+  p.innerHTML = `
+    <h2>${esc(n.en)}</h2>${n.ar ? `<p class="ar">${esc(n.ar)}</p>` : ""}
+    <div class="mono">${esc(n.id)}</div>
+    <h3>3D mesh</h3>
+    <div class="mono">${n.mesh ? esc(n.mesh) : '<span class="warn">null: no hotspot, demo skips it</span>'}</div>
+    <h3>Relations</h3>
+    <ul class="rels">${out.map(l => relRow(l.rel, byId[l.t], "→")).join("")}${inc.map(l => relRow(l.rel, byId[l.s], "←")).join("")
+      || '<li class="empty">none</li>'}</ul>
+    <h3>Knowledge</h3>
+    <ul class="rels">${locales.map(loc => {
+      const k = kn(n, loc);
+      return `<li><span class="rel mono">${loc}</span><span class="${k.approved ? "ok" : "warn"}">${k.approved} approved</span>
+              ${k.other.map(([s, c]) => `<span class="empty">· ${c} ${esc(s.toLowerCase())}</span>`).join("")}</li>`;
+    }).join("") || '<li class="empty">none</li>'}</ul>
+    <h3>GraphRAG seed · hops=${hops}</h3>
+    <pre class="mono">seed = [structure_id, *graph.neighbors(structure_id, hops=${hops})]
+# → ${seed.length} ids
+${seed.map(id => `  ${"·".repeat(lvl[id])}${lvl[id] ? " " : ""}${id}`).join("\n")}</pre>
+    <p class="empty" style="margin:8px 0 0">retrieve_chunks() searches APPROVED chunks for these ids:
+      ${locales.map(loc => `<span class="mono">${loc}</span> <b class="${seedApproved(loc) ? "ok" : "warn"}">${seedApproved(loc)}</b>`).join(" · ")}
+      ${locales.some(loc => seedApproved(loc) > 0 && kn(n, loc).approved === 0)
+        ? '<br><span class="warn">This structure has no approved text itself, but its neighbours do, so the tutor will still answer.</span>' : ""}</p>
+    <h3>Aliases (OntologyResolver)</h3>
+    <div class="chips">${n.aliases.map(a => `<span class="chip">${esc(a)}</span>`).join("") || '<span class="empty">none</span>'}</div>`;
+  p.querySelectorAll("a.jump").forEach(a => a.onclick = () => select(a.dataset.id));
+}
+
+DATA.forEach((l, i) => {
+  const b = document.createElement("button");
+  b.textContent = l.title; b.onclick = () => load(i);
+  $("#lessons").appendChild(b);
+});
+document.querySelectorAll("[data-hops]").forEach(b => b.onclick = () => {
+  hops = +b.dataset.hops;
+  document.querySelectorAll("[data-hops]").forEach(x => x.setAttribute("aria-pressed", x === b));
+  select(selected);
+});
+document.querySelectorAll("[data-lang]").forEach(b => b.onclick = () => {
+  lang = b.dataset.lang;
+  document.querySelectorAll("[data-lang]").forEach(x => x.setAttribute("aria-pressed", x === b));
+  setLabels();
+});
+$("#relayout").onclick = () => {
+  const { width, height } = svg.getBoundingClientRect();
+  nodes.forEach(n => { n.x = width / 2 + (Math.random() - .5) * 300; n.y = height / 2 + (Math.random() - .5) * 300; });
+  kick(1);
+};
+window.addEventListener("resize", () => kick(.3));
+if (DATA.length) load(0); else $("#panel").textContent = "No lessons found.";
+</script>
+</body>
+</html>

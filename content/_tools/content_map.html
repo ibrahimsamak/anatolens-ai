@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AnatoLens Content Map</title>
+<style>
+:root {
+  --bg: #f6f5f1; --surface: #ffffff; --sunk: #efeee9; --ink: #1d1f24; --muted: #6b6f78; --line: #dcdad3;
+  --accent: #c2410c; --accent-soft: #fde7da; --wire: #b9b6ad;
+  --ok: #2f7d4f; --ok-soft: #e1f2e7; --warn: #a86400; --warn-soft: #fbefd9; --err: #b42318; --err-soft: #fde4e1;
+  --info: #44607f; --info-soft: #e3ebf4;
+  --rel-part_of: #8a8f99; --rel-connects_to: #2f6fb3; --rel-flows_to: #c0392b; --rel-supplies: #7a4fb8; --rel-other: #3f8f6b;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121418; --surface: #1b1e24; --sunk: #16181d; --ink: #e8e9ec; --muted: #9aa0ab; --line: #2c3038;
+    --accent: #ff8a4c; --accent-soft: #3a2418; --wire: #4a4f59;
+    --ok: #5cc08a; --ok-soft: #173123; --warn: #e0a040; --warn-soft: #362a12; --err: #f07167; --err-soft: #3a1c1a;
+    --info: #8fb0d6; --info-soft: #1c2735;
+    --rel-part_of: #7d838e; --rel-connects_to: #5b9be0; --rel-flows_to: #ef6b5b; --rel-supplies: #a884e0; --rel-other: #5cc095;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121418; --surface: #1b1e24; --sunk: #16181d; --ink: #e8e9ec; --muted: #9aa0ab; --line: #2c3038;
+  --accent: #ff8a4c; --accent-soft: #3a2418; --wire: #4a4f59;
+  --ok: #5cc08a; --ok-soft: #173123; --warn: #e0a040; --warn-soft: #362a12; --err: #f07167; --err-soft: #3a1c1a;
+  --info: #8fb0d6; --info-soft: #1c2735;
+  --rel-part_of: #7d838e; --rel-connects_to: #5b9be0; --rel-flows_to: #ef6b5b; --rel-supplies: #a884e0; --rel-other: #5cc095;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+.mono { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: 12px; }
+.muted { color: var(--muted); }
+header { position: sticky; top: 0; z-index: 5; display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center;
+         padding: 12px 16px; background: var(--surface); border-bottom: 1px solid var(--line); }
+h1 { font-size: 16px; margin: 0; }
+h1 span { color: var(--muted); font-weight: 400; }
+.group { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+button { font: inherit; font-size: 13px; color: var(--ink); background: transparent; border: 1px solid var(--line);
+         border-radius: 6px; padding: 4px 10px; cursor: pointer; }
+button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+button:focus-visible, .cell:focus-visible, .pill:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+.legend i { display: inline-block; width: 16px; border-top: 2px solid; vertical-align: middle; margin-right: 4px; }
+#summary { display: flex; gap: 6px; flex-wrap: wrap; }
+.stat { font-size: 12px; padding: 2px 8px; border-radius: 999px; background: var(--sunk); }
+
+#scroller { overflow-x: auto; padding: 20px 16px 40px; }
+#board { position: relative; display: flex; gap: 28px; width: max-content; min-width: 100%; }
+#wires { position: absolute; inset: 0; pointer-events: none; overflow: visible; }
+
+#side { width: 260px; flex: none; display: flex; flex-direction: column; gap: 14px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px; }
+#lessonCard { position: relative; }
+#lessonCard img { width: 100%; max-height: 150px; object-fit: contain; background: var(--sunk); border-radius: 6px; margin-bottom: 8px; }
+#lessonCard h2 { margin: 0; font-size: 17px; }
+#fanOrigin { position: absolute; right: -5px; top: 50%; width: 10px; height: 10px; border-radius: 50%;
+             background: var(--accent); }
+dl { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; margin: 8px 0 0; font-size: 12px; }
+dt { color: var(--muted); } dd { margin: 0; word-break: break-all; }
+h3 { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 6px; }
+ul.files, ul.checks { list-style: none; margin: 0; padding: 0; }
+ul.files li { padding: 6px 8px; border-radius: 6px; cursor: default; border: 1px solid transparent; }
+ul.files li:hover, ul.files li.hl { background: var(--sunk); border-color: var(--line); }
+ul.files li .use { font-size: 11px; color: var(--muted); display: block; }
+ul.files li.missing { opacity: .55; } ul.files li.missing .mono { text-decoration: line-through; }
+ul.checks li { display: flex; gap: 6px; padding: 4px 0; font-size: 12px; border-top: 1px solid var(--line); }
+ul.checks li:first-child { border-top: 0; }
+ul.checks li[data-sid] { cursor: pointer; }
+.tag { font-size: 10px; font-weight: 600; text-transform: uppercase; border-radius: 4px; padding: 1px 5px; height: fit-content; flex: none; }
+.tag.error { background: var(--err-soft); color: var(--err); } .tag.warn { background: var(--warn-soft); color: var(--warn); }
+.tag.info { background: var(--info-soft); color: var(--info); } .tag.ok { background: var(--ok-soft); color: var(--ok); }
+
+#grid { display: grid; gap: 8px 22px; align-content: start; }
+.hd { font-weight: 600; font-size: 13px; padding: 0 2px 4px; border-bottom: 2px solid var(--line); transition: border-color .2s; }
+.hd small { display: block; font-weight: 400; color: var(--muted); }
+.hd.gutter { border: 0; }
+.cell { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; min-height: 58px;
+        opacity: 0; transition: opacity .35s, border-color .2s, background .2s; }
+.cell.in { opacity: 1; }
+.cell.gap { background: transparent; border-style: dashed; color: var(--muted); font-size: 12px; display: flex; align-items: center; }
+.cell.gap.warn { border-color: var(--warn); color: var(--warn); }
+.cell.st { cursor: pointer; position: relative; }
+.cell.st .name { font-weight: 600; }
+.cell.st .ar { direction: rtl; color: var(--muted); font-size: 12px; }
+.cell.st .badge { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; border-radius: 50%; }
+.badge.error { background: var(--err); } .badge.warn { background: var(--warn); }
+.cell.clickable { cursor: pointer; }
+.ok-t { color: var(--ok); } .err-t { color: var(--err); } .warn-t { color: var(--warn); }
+.pills { display: flex; flex-wrap: wrap; gap: 4px; }
+.pill { font-size: 11px; border-radius: 999px; padding: 1px 8px; cursor: pointer; border: 1px solid transparent; }
+.pill.APPROVED { background: var(--ok-soft); color: var(--ok); }
+.pill:not(.APPROVED) { background: var(--warn-soft); color: var(--warn); }
+.pill:hover { border-color: currentColor; }
+.colhl { border-color: var(--accent) !important; }
+.hd.colhl { border-bottom-color: var(--accent) !important; }
+#grid.focus .cell:not(.row-sel):not(.row-rel) { opacity: .35; }
+.cell.row-sel { border-color: var(--accent); background: var(--accent-soft); }
+.cell.st.row-rel { border-color: var(--ink); }
+
+.wire { fill: none; stroke: var(--wire); stroke-width: 1.5; transition: opacity .25s; }
+.wire.gapw { stroke-dasharray: 3 4; }
+.wire.fan { stroke: var(--accent); opacity: .35; }
+#board.focus .wire { opacity: .15; }
+#board.focus .wire.sel { opacity: 1; stroke: var(--accent); stroke-width: 2; }
+.arc { fill: none; stroke-width: 2; }
+.arc-label { font-size: 10px; paint-order: stroke; stroke: var(--bg); stroke-width: 3px; }
+
+#drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(420px, 100%); background: var(--surface);
+          border-left: 1px solid var(--line); box-shadow: -8px 0 30px rgba(0,0,0,.12); z-index: 10;
+          transform: translateX(105%); transition: transform .3s ease; overflow-y: auto; padding: 18px; }
+#drawer.open { transform: none; }
+#drawer .close { float: right; }
+#drawer h2 { margin: 0 0 2px; font-size: 18px; }
+#drawer h3 { margin-top: 18px; }
+#drawer .text { white-space: pre-wrap; line-height: 1.6; background: var(--sunk); border-radius: 8px; padding: 12px; }
+#drawer .text[dir="rtl"] { font-size: 15px; }
+.chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.chip { border: 1px solid var(--line); border-radius: 999px; padding: 1px 8px; font-size: 12px; }
+ul.rels { list-style: none; padding: 0; margin: 0; }
+ul.rels li { padding: 3px 0; }
+a.jump { color: var(--ink); cursor: pointer; text-decoration: underline; text-decoration-color: var(--line); }
+@media (prefers-reduced-motion: reduce) { .cell, #drawer, .wire { transition: none; } }
+@media (max-width: 700px) { #side { width: 220px; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>AnatoLens content map <span>· content/&lt;lesson&gt;/*.yaml</span></h1>
+  <div class="group" id="tabs" role="group" aria-label="Lesson"></div>
+  <div id="summary"></div>
+  <div class="legend" id="legend"></div>
+</header>
+<div id="scroller">
+  <div id="board">
+    <div id="side"></div>
+    <div id="grid"></div>
+    <svg id="wires" aria-hidden="true"><defs id="defs"></defs><g id="wireG"></g><g id="arcG"></g></svg>
+  </div>
+</div>
+<aside id="drawer" aria-live="polite"></aside>
+<script>
+const DATA = /*__DATA__*/[];
+const REL_LABEL = { part_of: "part of", connects_to: "connects to", flows_to: "flows to", supplies: "supplies" };
+const DIRECTED = new Set(["part_of", "flows_to", "supplies"]);
+const NS = "http://www.w3.org/2000/svg";
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+const relVar = rel => REL_LABEL[rel] ? `var(--rel-${rel})` : "var(--rel-other)";
+const fmtSize = b => b > 1e6 ? (b / 1e6).toFixed(1) + " MB" : b > 1e3 ? (b / 1e3).toFixed(1) + " KB" : b + " B";
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+let pack, locales, sel = null, hover = null;
+
+function load(i) {
+  pack = DATA[i]; sel = hover = null; closeDrawer();
+  document.querySelectorAll("#tabs button").forEach((b, j) => b.setAttribute("aria-pressed", i === j));
+  locales = Object.keys(pack.knowledge).sort((a, b) => (a === "en" ? -1 : b === "en" ? 1 : a.localeCompare(b)));
+  const L = pack.lesson, chunks = Object.values(pack.knowledge).flat();
+  const count = lvl => pack.checks.filter(c => c.level === lvl).length;
+  $("#summary").innerHTML = [
+    `${pack.structures.length} structures`, `${pack.hotspots.length} hotspots`,
+    ...locales.map(l => `${pack.knowledge[l].length} ${l} chunks`)
+  ].map(s => `<span class="stat">${s}</span>`).join("") +
+    `<span class="stat"><span class="err-t">${count("error")} errors</span> · <span class="warn-t">${count("warn")} warnings</span></span>`;
+  const rels = [...new Set(pack.structures.flatMap(s => Object.keys(s.relations)))];
+  $("#legend").innerHTML = rels.map(r => `<span><i style="border-color:${relVar(r)}"></i>${REL_LABEL[r] || r}</span>`).join("");
+
+  const lessonChecks = pack.checks.filter(c => !c.sid);
+  $("#side").innerHTML = `
+    <div class="card" id="lessonCard">
+      ${pack.preview ? `<img src="${pack.preview}" alt="${esc(L.title)} model preview">` : ""}
+      <h2>${esc(L.title)}</h2>
+      <dl class="mono"><dt>id</dt><dd>${esc(L.id)}</dd><dt>system</dt><dd>${esc(L.system)}</dd>
+        <dt>status</dt><dd>${esc(L.review_status)}</dd><dt>model</dt><dd>${esc(L.model_url)}</dd>
+        <dt>ios</dt><dd>${esc(L.ios_model_url)}</dd></dl>
+      <span id="fanOrigin" title="lesson.yaml → structures"></span>
+    </div>
+    <div class="card"><h3>Files in content/${esc(pack.dir)}/</h3><ul class="files">${pack.files.map(f => `
+      <li data-file="${esc(f.name)}" class="${f.exists ? "" : "missing"}">
+        <span class="mono">${esc(f.name)}</span> <span class="muted mono">${f.exists ? fmtSize(f.size) : "missing"}</span>
+        ${f.ingested === false && f.exists ? '<span class="tag error">not ingested</span>' : ""}
+        <span class="use">${esc(f.use)}</span></li>`).join("")}</ul></div>
+    <div class="card"><h3>Checks</h3><ul class="checks">${
+      [...lessonChecks, ...pack.checks.filter(c => c.sid && c.level !== "info")].map(c => `
+      <li ${c.sid ? `data-sid="${esc(c.sid)}"` : ""}><span class="tag ${c.level}">${c.level}</span>
+        <span>${c.sid ? `<b>${esc(name(c.sid))}</b>: ` : ""}${esc(c.msg)}</span></li>`).join("")
+      || '<li><span class="tag ok">ok</span> All cross-file references resolve</li>'}</ul></div>`;
+  document.querySelectorAll("ul.files li").forEach(li => {
+    li.onmouseenter = () => highlightCol(li.dataset.file, true);
+    li.onmouseleave = () => highlightCol(li.dataset.file, false);
+  });
+  document.querySelectorAll("ul.checks li[data-sid]").forEach(li => li.onclick = () => selectStructure(li.dataset.sid, true));
+
+  const glbFile = pack.glb ? `assets/${pack.glb}` : "assets/*.glb";
+  const cols = [
+    { key: "structures.yaml", title: "Structure" },
+    { key: glbFile, title: "3D mesh node" },
+    { key: "hotspots.yaml", title: "AR hotspot" },
+    ...locales.map(l => ({ key: `knowledge.${l}.yaml`, title: `Knowledge · ${l.toUpperCase()}` })),
+  ];
+  const grid = $("#grid");
+  grid.style.gridTemplateColumns = `56px 220px 170px 165px ${locales.map(() => "190px").join(" ")}`;
+  const notIngested = new Set(pack.files.filter(f => f.ingested === false).map(f => f.name));
+  let html = `<div class="hd gutter"></div>` + cols.map(c => `<div class="hd" data-col="${esc(c.key)}">${c.title}
+      <small class="mono">${esc(c.key)}${notIngested.has(c.key) ? ' · <span class="err-t">not ingested</span>' : ""}</small></div>`).join("");
+  const hs = Object.fromEntries(pack.hotspots.map(h => [h.structure_id, h]));
+  pack.structures.forEach((s, r) => {
+    const lvl = pack.checks.filter(c => c.sid === s.id).map(c => c.level);
+    const badge = lvl.includes("error") ? "error" : lvl.includes("warn") ? "warn" : "";
+    const inGlb = pack.glbNodes ? pack.glbNodes.includes(s.mesh) : null;
+    const h = hs[s.id];
+    html += `<div class="gutter" data-row="${r}"></div>
+      <div class="cell st" tabindex="0" role="button" data-sid="${esc(s.id)}" data-row="${r}" data-col="structures.yaml">
+        ${badge ? `<span class="badge ${badge}" title="${badge}"></span>` : ""}
+        <div class="name">${esc(s.en)}</div>${s.ar ? `<div class="ar">${esc(s.ar)}</div>` : ""}
+        <div class="mono muted">${esc(s.id)}</div></div>`;
+    html += s.mesh
+      ? `<div class="cell clickable" data-sid="${esc(s.id)}" data-row="${r}" data-col="${esc(glbFile)}">
+           <div class="mono">${esc(s.mesh)}</div>
+           ${inGlb === null ? "" : inGlb ? `<div class="ok-t" style="font-size:12px">✓ node in ${esc(pack.glb)}</div>`
+                                         : `<div class="err-t" style="font-size:12px">✗ not in ${esc(pack.glb)}</div>`}</div>`
+      : `<div class="cell gap" data-row="${r}" data-col="${esc(glbFile)}">mesh_name: null</div>`;
+    html += h
+      ? `<div class="cell clickable" data-sid="${esc(s.id)}" data-row="${r}" data-col="hotspots.yaml">
+           <div class="mono" style="font-size:11px">pos ${esc(h.position)}</div>
+           <div class="mono muted" style="font-size:11px">n ${esc(h.normal)}</div></div>`
+      : `<div class="cell gap ${s.mesh ? "warn" : ""}" data-row="${r}" data-col="hotspots.yaml">${s.mesh ? "missing hotspot" : "no mesh → no hotspot"}</div>`;
+    locales.forEach(l => {
+      const mine = pack.knowledge[l].map((c, idx) => ({ ...c, idx })).filter(c => c.structure_id === s.id);
+      const approved = mine.some(c => c.review_status === "APPROVED");
+      html += mine.length
+        ? `<div class="cell" data-row="${r}" data-col="knowledge.${l}.yaml"><div class="pills">${mine.map(c =>
+            `<span class="pill ${esc(c.review_status)}" tabindex="0" role="button" data-loc="${l}" data-idx="${c.idx}"
+               title="${esc(c.source)}">#${c.idx + 1} ${esc((c.review_status || "DRAFT").toLowerCase())}</span>`).join("")}</div>
+            <div class="muted" style="font-size:11px;margin-top:4px">${mine.length} chunk${mine.length > 1 ? "s" : ""}${approved ? "" : " · none approved"}</div></div>`
+        : `<div class="cell gap warn" data-row="${r}" data-col="knowledge.${l}.yaml">no knowledge</div>`;
+    });
+  });
+  grid.innerHTML = html;
+  grid.querySelectorAll(".cell.st, .cell.clickable").forEach(c => {
+    c.onclick = () => selectStructure(c.dataset.sid);
+    c.onmouseenter = () => { hover = c.dataset.sid; drawArcs(); };
+    c.onmouseleave = () => { hover = null; drawArcs(); };
+    c.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); selectStructure(c.dataset.sid); } };
+  });
+  grid.querySelectorAll(".pill").forEach(p => {
+    const open = e => { e.stopPropagation(); showChunk(p.dataset.loc, +p.dataset.idx); };
+    p.onclick = open; p.onkeydown = e => { if (e.key === "Enter" || e.key === " ") open(e); };
+  });
+  grid.querySelectorAll(".cell").forEach(c => {
+    const col = [...c.parentNode.children].indexOf(c) % (cols.length + 1);
+    setTimeout(() => c.classList.add("in"), reduced ? 0 : (+c.dataset.row) * 60 + col * 90);
+  });
+  requestAnimationFrame(() => drawWires(true));
+}
+const name = sid => (pack.structures.find(s => s.id === sid) || { en: sid }).en;
+
+function highlightCol(key, on) {
+  document.querySelectorAll(`#grid [data-col="${CSS.escape(key)}"]`).forEach(e => e.classList.toggle("colhl", on));
+}
+
+const pt = (e, side) => {
+  const b = $("#board").getBoundingClientRect(), r = e.getBoundingClientRect();
+  return { x: (side === "l" ? r.left : side === "r" ? r.right : r.left + r.width / 2) - b.left, y: r.top + r.height / 2 - b.top };
+};
+function path(d, cls, parent, delay, animate) {
+  const p = document.createElementNS(NS, "path");
+  p.setAttribute("d", d); p.setAttribute("class", cls);
+  parent.appendChild(p);
+  if (animate && !reduced) {
+    const len = p.getTotalLength();
+    p.style.strokeDasharray = `${len}`; p.style.strokeDashoffset = `${len}`;
+    p.getBoundingClientRect();
+    p.style.transition = `stroke-dashoffset .6s ease ${delay}ms`;
+    p.style.strokeDashoffset = "0";
+    p.addEventListener("transitionend", () => { p.style.strokeDasharray = ""; p.style.strokeDashoffset = ""; p.style.transition = ""; }, { once: true });
+  }
+  return p;
+}
+function drawWires(animate = false) {
+  const g = $("#wireG"); g.innerHTML = "";
+  const board = $("#board"), svg = $("#wires");
+  svg.setAttribute("width", board.scrollWidth); svg.setAttribute("height", board.scrollHeight);
+  const o = pt($("#fanOrigin"), "c");
+  const rows = pack.structures.length;
+  for (let r = 0; r < rows; r++) {
+    const cells = [...document.querySelectorAll(`#grid .cell[data-row="${r}"]`)];
+    const sid = pack.structures[r].id;
+    const a = pt(cells[0], "l");
+    const mx = o.x + (a.x - o.x) * .55;
+    path(`M${o.x},${o.y} C${mx},${o.y} ${mx},${a.y} ${a.x},${a.y}`, "wire fan" + (sid === sel ? " sel" : ""), g, r * 60, animate);
+    for (let i = 0; i < cells.length - 1; i++) {
+      const p1 = pt(cells[i], "r"), p2 = pt(cells[i + 1], "l");
+      const gap = cells[i + 1].classList.contains("gap") || cells[i].classList.contains("gap");
+      path(`M${p1.x},${p1.y} L${p2.x},${p2.y}`, `wire${gap ? " gapw" : ""}${sid === sel ? " sel" : ""}`, g, 300 + r * 60 + i * 90, animate);
+    }
+  }
+  drawArcs();
+}
+
+function relationsOf(sid) {
+  const out = [], seen = new Set();
+  pack.structures.forEach(s => Object.entries(s.relations).forEach(([rel, ts]) => ts.forEach(t => {
+    if (s.id !== sid && t !== sid) return;
+    const other = s.id === sid ? t : s.id;
+    const key = DIRECTED.has(rel) ? `${rel}|${s.id}|${t}` : `${rel}|${[s.id, t].sort()}`;
+    if (!seen.has(key) && pack.structures.some(x => x.id === other)) { seen.add(key); out.push({ rel, from: s.id, to: t, other }); }
+  })));
+  return out;
+}
+function drawArcs() {
+  const g = $("#arcG"), defs = $("#defs"); g.innerHTML = "";
+  const focus = sel || hover;
+  $("#board").classList.toggle("focus", !!focus);
+  $("#grid").classList.toggle("focus", !!sel);
+  document.querySelectorAll("#grid .cell").forEach(c => c.classList.remove("row-sel", "row-rel"));
+  if (!focus) return;
+  const rels = relationsOf(focus);
+  const rowOf = sid => pack.structures.findIndex(s => s.id === sid);
+  document.querySelectorAll(`#grid .cell[data-row="${rowOf(focus)}"]`).forEach(c => c.classList.add("row-sel"));
+  rels.forEach(r => $(`#grid .cell.st[data-sid="${CSS.escape(r.other)}"]`)?.classList.add("row-rel"));
+  const stCell = sid => $(`#grid .cell.st[data-sid="${CSS.escape(sid)}"]`);
+  const perOther = {};
+  rels.forEach(r => {
+    if (!defs.querySelector(`#ah-${r.rel}`)) {
+      defs.insertAdjacentHTML("beforeend", `<marker id="ah-${r.rel}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:${relVar(r.rel)}"/></marker>`);
+    }
+    const k = perOther[r.other] = (perOther[r.other] || 0) + 1;
+    const a = pt(stCell(r.from), "l"), b = pt(stCell(r.to), "l");
+    a.x -= 2; b.x -= 4;
+    const bulge = Math.min(50, 14 + Math.abs(b.y - a.y) * .08) + (k - 1) * 9;
+    const cx = Math.min(a.x, b.x) - bulge;
+    const p = path(`M${a.x},${a.y} C${cx},${a.y} ${cx},${b.y} ${b.x},${b.y}`, "arc", g, 0, true);
+    p.style.stroke = relVar(r.rel);
+    if (r.rel === "part_of") p.setAttribute("stroke-dasharray", "5 4");
+    if (DIRECTED.has(r.rel)) p.setAttribute("marker-end", `url(#ah-${r.rel})`);
+    const t = document.createElementNS(NS, "text");
+    t.setAttribute("x", cx + 2); t.setAttribute("y", (a.y + b.y) / 2 + 3); t.setAttribute("class", "arc-label");
+    t.setAttribute("text-anchor", "middle"); t.style.fill = relVar(r.rel);
+    t.textContent = (REL_LABEL[r.rel] || r.rel).split(" ")[0];
+    if (Math.abs(b.y - a.y) > 40 && rels.filter(x => x.other === r.other).length === 1) g.appendChild(t);
+  });
+}
+
+function selectStructure(sid, scroll = false) {
+  sel = sel === sid && !scroll ? null : sid;
+  drawWires();
+  if (!sel) return closeDrawer();
+  if (scroll) $(`#grid .cell.st[data-sid="${CSS.escape(sid)}"]`)?.scrollIntoView({ block: "center", behavior: reduced ? "auto" : "smooth" });
+  const s = pack.structures.find(x => x.id === sid), h = pack.hotspots.find(x => x.structure_id === sid);
+  const rels = relationsOf(sid);
+  const checks = pack.checks.filter(c => c.sid === sid);
+  openDrawer(`
+    <h2>${esc(s.en)}</h2>${s.ar ? `<div dir="rtl" class="muted">${esc(s.ar)}</div>` : ""}
+    <div class="mono muted">${esc(s.id)}</div>
+    <h3>Checks</h3><ul class="checks">${checks.map(c => `<li><span class="tag ${c.level}">${c.level}</span><span>${esc(c.msg)}</span></li>`).join("")
+      || '<li><span class="tag ok">ok</span><span>All references resolve</span></li>'}</ul>
+    <h3>Relations · structures.yaml</h3><ul class="rels">${rels.map(r => `<li>
+      <span class="mono" style="color:${relVar(r.rel)}">${r.from === sid ? "→" : "←"} ${esc(REL_LABEL[r.rel] || r.rel)}</span>
+      <a class="jump" data-sid="${esc(r.other)}">${esc(name(r.other))}</a></li>`).join("") || '<li class="muted">none (root concept)</li>'}</ul>
+    <h3>3D · ${esc(pack.glb || "GLB")} + hotspots.yaml</h3>
+    <dl class="mono"><dt>mesh_name</dt><dd>${esc(s.mesh ?? "null")}</dd>
+      <dt>position</dt><dd>${esc(h?.position ?? "—")}</dd><dt>normal</dt><dd>${esc(h?.normal ?? "—")}</dd></dl>
+    <h3>Knowledge</h3><ul class="rels">${locales.map(l => pack.knowledge[l].map((c, i) => ({ ...c, i })).filter(c => c.structure_id === sid)
+      .map(c => `<li><a class="jump" data-loc="${l}" data-idx="${c.i}">${l} #${c.i + 1}</a>
+        <span class="tag ${c.review_status === "APPROVED" ? "ok" : "warn"}">${esc(c.review_status)}</span>
+        <span class="muted">${esc(c.text.slice(0, 70))}…</span></li>`).join("")).join("") || '<li class="muted">none</li>'}</ul>
+    <h3>Aliases · OntologyResolver</h3><div class="chips">${s.aliases.map(a => `<span class="chip">${esc(a)}</span>`).join("")}</div>`);
+}
+function showChunk(loc, idx) {
+  const c = pack.knowledge[loc][idx];
+  sel = c.structure_id; drawWires();
+  openDrawer(`
+    <h2>knowledge.${esc(loc)}.yaml #${idx + 1}</h2>
+    <div class="muted">for <a class="jump" data-sid="${esc(c.structure_id)}">${esc(name(c.structure_id))}</a></div>
+    <dl class="mono"><dt>status</dt><dd>${esc(c.review_status)}</dd><dt>source</dt><dd>${esc(c.source)}</dd>
+      <dt>version</dt><dd>${esc(c.source_version)}</dd><dt>reviewer</dt><dd>${esc(c.reviewer ?? "—")}</dd></dl>
+    <h3>Text</h3><div class="text" dir="${loc === "ar" ? "rtl" : "ltr"}" lang="${esc(loc)}">${esc(c.text.trim())}</div>`);
+}
+function openDrawer(html) {
+  const d = $("#drawer");
+  d.innerHTML = `<button class="close" aria-label="Close">✕</button>` + html;
+  d.classList.add("open");
+  d.querySelector(".close").onclick = () => { sel = null; closeDrawer(); drawWires(); };
+  d.querySelectorAll("a.jump").forEach(a => a.onclick = () =>
+    a.dataset.loc ? showChunk(a.dataset.loc, +a.dataset.idx) : selectStructure(a.dataset.sid, true));
+}
+function closeDrawer() { $("#drawer").classList.remove("open"); }
+document.addEventListener("keydown", e => { if (e.key === "Escape" && sel) { sel = null; closeDrawer(); drawWires(); } });
+
+DATA.forEach((p, i) => {
+  const b = document.createElement("button");
+  b.textContent = p.lesson.title; b.onclick = () => load(i);
+  $("#tabs").appendChild(b);
+});
+let rz; window.addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => pack && drawWires(), 80); });
+const linked = decodeURIComponent(location.hash.slice(1));
+const linkedPack = DATA.findIndex(p => p.structures.some(s => s.id === linked));
+if (linkedPack >= 0) { load(linkedPack); setTimeout(() => selectStructure(linked, true), reduced ? 0 : 700); }
+else if (DATA.length) load(0); else document.body.insertAdjacentHTML("beforeend", "<p style='padding:16px'>No lesson packs found.</p>");
+</script>
+</body>
+</html>
