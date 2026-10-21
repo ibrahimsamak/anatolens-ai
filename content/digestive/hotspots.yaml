@@ -1,0 +1,60 @@
+- structure_id: digestive.esophagus
+  mesh_name: Digestive_Esophagus
+  position: "0.006m 0.4646m -0.0282m"
+  normal: "-0.0112 0.1367 0.9906"
+- structure_id: digestive.stomach
+  mesh_name: Digestive_Stomach
+  position: "0.0545m 0.3243m 0.0874m"
+  normal: "0.052 0.0872 0.9948"
+- structure_id: digestive.duodenum
+  mesh_name: Digestive_Duodenum
+  position: "0.0102m 0.2649m 0.0418m"
+  normal: "0.042 0.0178 0.999"
+- structure_id: digestive.jejunum
+  mesh_name: Digestive_Jejunum
+  position: "0.0247m 0.2172m 0.0766m"
+  normal: "-0.1561 0.2171 0.9636"
+- structure_id: digestive.ileum
+  mesh_name: Digestive_Ileum
+  position: "-0.0039m 0.1431m 0.0704m"
+  normal: "-0.1549 -0.4744 0.8666"
+- structure_id: digestive.cecum
+  mesh_name: Digestive_Cecum
+  position: "-0.0536m 0.1325m 0.0319m"
+  normal: "0.45 0.1004 0.8873"
+- structure_id: digestive.appendix
+  mesh_name: Digestive_Appendix
+  position: "-0.0807m 0.1189m 0.0129m"
+  normal: "-0.3424 -0.4744 0.811"
+- structure_id: digestive.ascending_colon
+  mesh_name: Digestive_AscendingColon
+  position: "-0.0849m 0.1778m 0.0254m"
+  normal: "-0.0023 0.0326 0.9995"
+- structure_id: digestive.transverse_colon
+  mesh_name: Digestive_TransverseColon
+  position: "0.0142m 0.2631m 0.0887m"
+  normal: "-0.0391 0.4654 0.8842"
+- structure_id: digestive.descending_colon
+  mesh_name: Digestive_DescendingColon
+  position: "0.0883m 0.1517m 0.0272m"
+  normal: "-0.1267 0.2911 0.9483"
+- structure_id: digestive.rectum
+  mesh_name: Digestive_Rectum
+  position: "0.0017m 0.0746m -0.0385m"
+  normal: "0.1011 -0.1518 0.9832"
+- structure_id: digestive.liver
+  mesh_name: Digestive_Liver
+  position: "0.0244m 0.3663m 0.0956m"
+  normal: "0.0013 -0.0126 0.9999"
+- structure_id: digestive.gallbladder
+  mesh_name: Digestive_Gallbladder
+  position: "-0.0411m 0.3082m 0.0696m"
+  normal: "0.1176 0.5759 0.809"
+- structure_id: digestive.bile_ducts
+  mesh_name: Digestive_BileDucts
+  position: "-0.0176m 0.3334m 0.035m"
+  normal: "0.312 -0.4489 0.8374"
+- structure_id: digestive.pancreas
+  mesh_name: Digestive_Pancreas
+  position: "0.0023m 0.2845m 0.0395m"
+  normal: "-0.0803 -0.0048 0.9968"

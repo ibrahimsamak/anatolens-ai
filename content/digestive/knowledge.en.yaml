@@ -1,0 +1,232 @@
+- structure_id: digestive.digestive_system
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    The digestive system consists of the alimentary (gastrointestinal) tract, a continuous tube
+    running from the mouth through the pharynx, esophagus, stomach, small intestine and large
+    intestine to the anus, together with accessory organs: the salivary glands, liver, gallbladder
+    and pancreas. It ingests food, breaks it down mechanically and chemically, absorbs nutrients
+    and water, and eliminates the undigested residue.
+
+- structure_id: digestive.digestive_system
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    From the esophagus to the anal canal the wall of the gut has four layers: mucosa, submucosa,
+    muscularis externa and an outer serosa or adventitia. Waves of contraction in the muscularis
+    (peristalsis) move the contents along, controlled by the enteric nervous system and modified
+    by autonomic nerves and gut hormones.
+
+- structure_id: digestive.esophagus
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    The esophagus is a muscular tube about 25 cm long that carries food from the pharynx (at the
+    level of C6) to the stomach. It descends behind the trachea and heart and passes through the
+    esophageal hiatus of the diaphragm at about T10. Its upper third is skeletal muscle, its lower
+    third smooth muscle, and the middle third a mixture. An upper and a lower esophageal sphincter
+    control entry and help prevent reflux of gastric contents.
+
+- structure_id: digestive.stomach
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    The stomach is the widest part of the alimentary tract, lying mainly in the left upper abdomen.
+    It has a cardia, fundus, body and pyloric part, with lesser and greater curvatures. Gastric
+    glands secrete hydrochloric acid and intrinsic factor (parietal cells) and pepsinogen (chief
+    cells). The stomach stores and churns food into semi-liquid chyme, and the pyloric sphincter
+    regulates its emptying into the duodenum.
+
+- structure_id: digestive.duodenum
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    The duodenum is the first and shortest part of the small intestine, about 25 cm long. It forms
+    a C-shaped curve around the head of the pancreas in four parts: superior, descending,
+    horizontal and ascending. The common bile duct and main pancreatic duct open into the
+    descending part at the major duodenal papilla, so bile and pancreatic enzymes mix with chyme
+    here. It ends at the duodenojejunal flexure.
+
+- structure_id: digestive.jejunum
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    The jejunum forms roughly the proximal two-fifths of the small intestine beyond the duodenum
+    and lies mostly in the left upper abdomen, suspended by the mesentery. Compared with the ileum
+    it has a wider lumen, a thicker wall, tall closely packed circular folds, long vasa recta and
+    few arterial arcades. It is the main site of nutrient absorption.
+
+- structure_id: digestive.ileum
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    The ileum forms the distal three-fifths of the small intestine and lies mainly in the lower
+    right abdomen and pelvis. Its wall is thinner, its circular folds fewer, and its mesentery
+    carries more arterial arcades with short vasa recta. Aggregated lymphoid nodules (Peyer's
+    patches) are prominent. The terminal ileum absorbs vitamin B12 and bile salts, and the ileum
+    ends at the ileocecal junction.
+
+- structure_id: digestive.cecum
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    The cecum is the blind-ended pouch at the start of the large intestine, lying in the right
+    iliac fossa below the level of the ileocecal junction. The ileum opens into it at the
+    ileocecal orifice, whose valve-like folds limit backflow. The appendix arises from its
+    posteromedial wall, and it continues upward as the ascending colon.
+
+- structure_id: digestive.appendix
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    The vermiform appendix is a narrow blind-ended tube, usually 6-10 cm long, arising from the
+    posteromedial wall of the cecum where the three taeniae coli converge. Its position varies,
+    retrocecal being the most common. Its wall is rich in lymphoid tissue. The base of the appendix
+    is classically marked on the skin at McBurney's point, one third of the way from the anterior
+    superior iliac spine to the umbilicus; inflammation of the appendix is appendicitis.
+
+- structure_id: digestive.ascending_colon
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    The ascending colon runs up the right side of the abdomen from the cecum to the right colic
+    (hepatic) flexure beneath the liver, and is usually retroperitoneal. Like the rest of the colon
+    it shows three longitudinal muscle bands (taeniae coli), sacculations (haustra) and fatty
+    omental appendices. The colon absorbs water and electrolytes, turning liquid contents into
+    feces.
+
+- structure_id: digestive.transverse_colon
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    The transverse colon crosses the abdomen from the right colic flexure to the left colic
+    (splenic) flexure. It is the longest and most mobile part of the large intestine, suspended
+    by the transverse mesocolon, and often hangs down below the level of the iliac crests. Its
+    proximal two-thirds belong to the midgut (middle colic artery) and its distal third to the
+    hindgut (inferior mesenteric artery branches).
+
+- structure_id: digestive.descending_colon
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    The descending colon runs down the left side of the abdomen from the left colic flexure to the
+    pelvic brim, where it becomes the sigmoid colon. It is retroperitoneal and is supplied by the
+    left colic artery, a branch of the inferior mesenteric artery. As contents pass through it,
+    water absorption makes the stool progressively firmer.
+
+- structure_id: digestive.sigmoid_colon
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    The sigmoid colon is an S-shaped loop that runs from the pelvic brim to the rectum at about
+    the level of S3. It hangs on its own mesentery, the sigmoid mesocolon, which makes it mobile,
+    and it is supplied by the sigmoid arteries. It is a common site of diverticula and can twist
+    on its mesentery (sigmoid volvulus).
+
+- structure_id: digestive.rectum
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    The rectum continues from the sigmoid colon at about S3 to the anorectal junction, about 12 cm
+    in length, following the curve of the sacrum. Here the taeniae coli spread out into a
+    continuous muscle coat, so the rectum has no haustra or omental appendices. Its dilated lower
+    part, the rectal ampulla, holds feces until defecation.
+
+- structure_id: digestive.anal_canal
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    The anal canal is the final 3-4 cm of the alimentary tract, running from the anorectal
+    junction, where the puborectalis muscle forms a sling, to the anus. It is surrounded by an
+    involuntary internal anal sphincter of smooth muscle and a voluntary external anal sphincter
+    of skeletal muscle. The pectinate line divides it into upper and lower parts with different
+    blood supply, lymph drainage and nerve supply.
+
+- structure_id: digestive.liver
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    The liver is the largest gland in the body, about 1.5 kg, lying in the right upper abdomen
+    beneath the diaphragm. It receives a dual blood supply: about three-quarters from the hepatic
+    portal vein, carrying nutrient-rich blood from the gut, and the rest from the hepatic artery.
+    Blood leaves through the hepatic veins into the inferior vena cava. The liver produces bile,
+    processes absorbed nutrients, makes plasma proteins, stores glycogen and vitamins, and
+    detoxifies drugs and metabolites.
+
+- structure_id: digestive.liver
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    Anatomically the liver has right, left, caudate and quadrate lobes. Functionally it is divided
+    into eight segments (Couinaud segments), each with its own branch of the portal vein, hepatic
+    artery and bile duct, which allows surgeons to remove individual segments.
+
+- structure_id: digestive.gallbladder
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    The gallbladder is a pear-shaped sac lying in a fossa on the visceral surface of the liver,
+    with a fundus, body and neck. It stores and concentrates bile, holding about 30-50 mL. After a
+    fatty meal the hormone cholecystokinin makes it contract, releasing bile through the cystic
+    duct and common bile duct into the duodenum. Gallstones can form when bile becomes
+    supersaturated.
+
+- structure_id: digestive.bile_ducts
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    The right and left hepatic ducts drain bile from the liver and unite to form the common
+    hepatic duct. This is joined by the cystic duct from the gallbladder to form the common bile
+    duct, which passes behind the duodenum and through the head of the pancreas. It usually joins
+    the main pancreatic duct at the hepatopancreatic ampulla, which opens into the duodenum at the
+    major duodenal papilla, guarded by the sphincter of Oddi.
+
+- structure_id: digestive.pancreas
+  review_status: APPROVED
+  source: "Gray's Anatomy (educational summary)"
+  source_version: "dev-seed-2026-10"
+  reviewer: pending
+  text: >
+    The pancreas is a retroperitoneal gland lying behind the stomach. Its head sits within the
+    curve of the duodenum, and its neck, body and tail extend to the left toward the spleen. As an
+    exocrine gland it secretes digestive enzymes (such as trypsinogen, amylase and lipase) and
+    bicarbonate into the duodenum through the main pancreatic duct. As an endocrine gland its
+    islets of Langerhans release insulin and glucagon into the blood.

@@ -27,7 +27,24 @@ HEART = {
     "Heart_CoronaryArteries": (FJ(*range(2631, 2655), 2667, 2668, *range(2670, 2678), *range(2692, 2701), *range(2714, 2724), 2737), [230, 60, 50]),
     "Heart_CardiacVeins":   (FJ(2655, 2656, 2724, 2727, 2728, 2729, 2731), [70, 90, 180]),
 }
-CLIP_Z_MIN = {"Heart_InferiorVenaCava": 1160.0}
+DIGESTIVE = {
+    "Digestive_Esophagus":       (FJ(2563), [214, 120, 120]),
+    "Digestive_Stomach":         (FJ(2564), [224, 128, 118]),
+    "Digestive_Duodenum":        (FJ(2573), [232, 168, 120]),
+    "Digestive_Jejunum":         (FJ(*range(2606, 2629)), [236, 150, 138]),
+    "Digestive_Ileum":           (FJ(*range(2574, 2599), *range(2600, 2606)), [226, 140, 128]),
+    "Digestive_Cecum":           (FJ(2599), [192, 142, 100]),
+    "Digestive_Appendix":        (FJ(2565), [205, 152, 110]),
+    "Digestive_AscendingColon":  (FJ(2566), [200, 152, 104]),
+    "Digestive_TransverseColon": (FJ(2572), [190, 144, 98]),
+    "Digestive_DescendingColon": (FJ(2567), [180, 136, 92]),
+    "Digestive_Rectum":          (FJ(2571), [170, 112, 90]),
+    "Digestive_Liver":           (FJ(2816, 2409, *range(2818, 2825)), [140, 52, 46]),
+    "Digestive_Gallbladder":     (FJ(2817), [72, 140, 82]),
+    "Digestive_BileDucts":       (FJ(3079, 3080, 3096, 3123), [104, 172, 92]),
+    "Digestive_Pancreas":        (FJ(1895, 2629), [236, 200, 130]),
+}
+CLIP_Z_MIN ={"Heart_InferiorVenaCava": 1160.0}
 R = np.array([[1, 0, 0, 0], [0, 0, 1, 0], [0, -1, 0, 0], [0, 0, 0, 1]], float)
 S = np.diag([0.001, 0.001, 0.001, 1.0])
 
@@ -70,5 +87,6 @@ def build(name, spec):
     print(f"{path}: {len(meshes)} nodes, size(m)={np.round(hi - lo, 3).tolist()}")
     json.dump(hotspots, open(f"{OUT}/{name}.hotspots.json", "w"), indent=1)
 
-build("spine", SPINE)
-build("heart", HEART)
+PACKS = {"spine": SPINE, "heart": HEART, "digestive": DIGESTIVE}
+for name in sys.argv[3:] or PACKS:
+    build(name, PACKS[name])

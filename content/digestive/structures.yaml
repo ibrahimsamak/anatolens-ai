@@ -1,0 +1,167 @@
+- id: digestive.digestive_system
+  mesh_name: null
+  display_name_en: Digestive system
+  display_name_ar: الجهاز الهضمي
+  aliases: [digestive system, digestive tract, gastrointestinal tract, gi tract, alimentary canal, alimentary system, gut, "الجهاز الهضمي", "القناة الهضمية"]
+  relations: {}
+
+- id: digestive.esophagus
+  mesh_name: Digestive_Esophagus
+  display_name_en: Esophagus
+  display_name_ar: المريء
+  aliases: [esophagus, oesophagus, gullet, food pipe, "المريء"]
+  relations: { part_of: [digestive.digestive_system], connects_to: [digestive.stomach], flows_to: [digestive.stomach] }
+
+- id: digestive.stomach
+  mesh_name: Digestive_Stomach
+  display_name_en: Stomach
+  display_name_ar: المعدة
+  aliases: [stomach, gastric, ventriculus, "المعدة"]
+  relations:
+    part_of: [digestive.digestive_system]
+    connects_to: [digestive.esophagus, digestive.duodenum]
+    flows_to: [digestive.duodenum]
+
+- id: digestive.duodenum
+  mesh_name: Digestive_Duodenum
+  display_name_en: Duodenum
+  display_name_ar: الاثنا عشر (العفج)
+  aliases: [duodenum, duodenal, "الاثنا عشر", "الإثنا عشري", "العفج"]
+  relations:
+    part_of: [digestive.digestive_system]
+    connects_to: [digestive.stomach, digestive.jejunum, digestive.pancreas, digestive.bile_ducts]
+    flows_to: [digestive.jejunum]
+
+- id: digestive.jejunum
+  mesh_name: Digestive_Jejunum
+  display_name_en: Jejunum
+  display_name_ar: الصائم
+  aliases: [jejunum, jejunal, "الصائم"]
+  relations:
+    part_of: [digestive.digestive_system]
+    connects_to: [digestive.duodenum, digestive.ileum]
+    flows_to: [digestive.ileum]
+
+- id: digestive.ileum
+  mesh_name: Digestive_Ileum
+  display_name_en: Ileum
+  display_name_ar: اللفائفي
+  aliases: [ileum, ileal, terminal ileum, "اللفائفي", "المعي اللفائفي"]
+  relations:
+    part_of: [digestive.digestive_system]
+    connects_to: [digestive.jejunum, digestive.cecum]
+    flows_to: [digestive.cecum]
+
+- id: digestive.cecum
+  mesh_name: Digestive_Cecum
+  display_name_en: Cecum
+  display_name_ar: الأعور
+  aliases: [cecum, caecum, cecal, ileocecal junction, ileocecal valve, "الأعور"]
+  relations:
+    part_of: [digestive.digestive_system]
+    connects_to: [digestive.ileum, digestive.appendix, digestive.ascending_colon]
+    flows_to: [digestive.ascending_colon]
+
+- id: digestive.appendix
+  mesh_name: Digestive_Appendix
+  display_name_en: Vermiform appendix
+  display_name_ar: الزائدة الدودية
+  aliases: [appendix, vermiform appendix, "الزائدة الدودية", "الزائدة"]
+  relations: { part_of: [digestive.digestive_system], connects_to: [digestive.cecum] }
+
+- id: digestive.ascending_colon
+  mesh_name: Digestive_AscendingColon
+  display_name_en: Ascending colon
+  display_name_ar: القولون الصاعد
+  aliases: [ascending colon, right colon, hepatic flexure, right colic flexure, "القولون الصاعد"]
+  relations:
+    part_of: [digestive.digestive_system]
+    connects_to: [digestive.cecum, digestive.transverse_colon]
+    flows_to: [digestive.transverse_colon]
+
+- id: digestive.transverse_colon
+  mesh_name: Digestive_TransverseColon
+  display_name_en: Transverse colon
+  display_name_ar: القولون المستعرض
+  aliases: [transverse colon, "القولون المستعرض"]
+  relations:
+    part_of: [digestive.digestive_system]
+    connects_to: [digestive.ascending_colon, digestive.descending_colon]
+    flows_to: [digestive.descending_colon]
+
+- id: digestive.descending_colon
+  mesh_name: Digestive_DescendingColon
+  display_name_en: Descending colon
+  display_name_ar: القولون النازل
+  aliases: [descending colon, left colon, splenic flexure, left colic flexure, "القولون النازل"]
+  relations:
+    part_of: [digestive.digestive_system]
+    connects_to: [digestive.transverse_colon, digestive.sigmoid_colon]
+    flows_to: [digestive.sigmoid_colon]
+
+- id: digestive.sigmoid_colon
+  mesh_name: null
+  display_name_en: Sigmoid colon
+  display_name_ar: القولون السيني
+  aliases: [sigmoid colon, sigmoid, pelvic colon, "القولون السيني"]
+  relations:
+    part_of: [digestive.digestive_system]
+    connects_to: [digestive.descending_colon, digestive.rectum]
+    flows_to: [digestive.rectum]
+
+- id: digestive.rectum
+  mesh_name: Digestive_Rectum
+  display_name_en: Rectum
+  display_name_ar: المستقيم
+  aliases: [rectum, rectal, "المستقيم"]
+  relations:
+    part_of: [digestive.digestive_system]
+    connects_to: [digestive.sigmoid_colon, digestive.anal_canal]
+    flows_to: [digestive.anal_canal]
+
+- id: digestive.anal_canal
+  mesh_name: null
+  display_name_en: Anal canal
+  display_name_ar: القناة الشرجية
+  aliases: [anal canal, anus, anal, "القناة الشرجية", "الشرج"]
+  relations: { part_of: [digestive.digestive_system], connects_to: [digestive.rectum] }
+
+- id: digestive.liver
+  mesh_name: Digestive_Liver
+  display_name_en: Liver
+  display_name_ar: الكبد
+  aliases: [liver, hepatic, hepar, "الكبد"]
+  relations:
+    part_of: [digestive.digestive_system]
+    connects_to: [digestive.gallbladder, digestive.bile_ducts]
+    flows_to: [digestive.bile_ducts]
+
+- id: digestive.gallbladder
+  mesh_name: Digestive_Gallbladder
+  display_name_en: Gallbladder
+  display_name_ar: المرارة
+  aliases: [gallbladder, gall bladder, cholecyst, "المرارة", "الحويصلة الصفراوية"]
+  relations:
+    part_of: [digestive.digestive_system]
+    connects_to: [digestive.liver, digestive.bile_ducts]
+    flows_to: [digestive.bile_ducts]
+
+- id: digestive.bile_ducts
+  mesh_name: Digestive_BileDucts
+  display_name_en: Bile ducts
+  display_name_ar: القنوات الصفراوية
+  aliases: [bile duct, bile ducts, biliary tree, common bile duct, common hepatic duct, cystic duct, hepatic duct, "القنوات الصفراوية", "القناة الصفراوية"]
+  relations:
+    part_of: [digestive.digestive_system]
+    connects_to: [digestive.liver, digestive.gallbladder, digestive.duodenum, digestive.pancreas]
+    flows_to: [digestive.duodenum, digestive.gallbladder]
+
+- id: digestive.pancreas
+  mesh_name: Digestive_Pancreas
+  display_name_en: Pancreas
+  display_name_ar: البنكرياس
+  aliases: [pancreas, pancreatic, "البنكرياس", "المعثكلة"]
+  relations:
+    part_of: [digestive.digestive_system]
+    connects_to: [digestive.duodenum, digestive.bile_ducts]
+    flows_to: [digestive.duodenum]
