@@ -47,3 +47,20 @@ input { flex: 1; min-width: 0; font: inherit; color: var(--ink); background: var
 #card p { margin: 0 0 10px; white-space: pre-wrap; }
 #card small { color: var(--muted); }
 #card small.ok { color: var(--ok); } #card small.warn { color: var(--warn); }
+
+h2.spaced { margin-top: 20px; }
+#quiz { margin-top: 10px; background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 14px; }
+#quiz-meta { color: var(--muted); text-transform: capitalize; }
+#quiz-prompt { margin: 4px 0 10px; font-weight: 600; }
+.choices { display: grid; gap: 6px; }
+.choices button { text-align: left; border-radius: 10px; }
+.choices button:disabled { cursor: default; opacity: .7; }
+.choices button.right { border-color: var(--ok); color: var(--ok); opacity: 1; }
+.choices button.wrong { border-color: var(--warn); color: var(--warn); opacity: 1; }
+#quiz-feedback { margin: 10px 0 0; min-height: 1.5em; }
+#quiz-feedback.ok { color: var(--ok); } #quiz-feedback.warn { color: var(--warn); }
+#quiz-next { margin-top: 6px; background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+#quiz-progress { list-style: none; padding: 0; margin: 12px 0 0; font-size: 13px; color: var(--muted); }
+#quiz-progress li { padding: 2px 0; text-transform: capitalize;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--ok) 18%, transparent) calc(var(--m, 0) * 100%), transparent 0); }
+model-viewer { cursor: pointer; }

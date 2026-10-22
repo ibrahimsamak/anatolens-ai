@@ -35,6 +35,16 @@
         <p id="card-text"></p>
         <small id="card-meta"></small>
       </article>
+      <h2 class="spaced">Quiz</h2>
+      <button id="quiz-btn" type="button">Quiz me</button>
+      <article id="quiz" hidden aria-live="polite">
+        <small id="quiz-meta"></small>
+        <p id="quiz-prompt"></p>
+        <div id="quiz-choices" class="choices"></div>
+        <p id="quiz-feedback" role="status"></p>
+        <button id="quiz-next" type="button" hidden>Next question</button>
+        <ul id="quiz-progress"></ul>
+      </article>
     </section>
   </main>
   <script type="module" src="/src/main.ts"></script>
