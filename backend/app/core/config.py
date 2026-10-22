@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from typing import Literal
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -21,6 +22,11 @@ class Settings(BaseSettings):
     langsmith_project : str = ""
     langsmith_auto_threshold: float = 0.95
     langsmith_min_threshold: float = 0.80
+    judge_backend: Literal["llm", "jev"] = "llm"
+    judge_threshold: float = 0.5
+    jev_url: str = ""
+    jev_api_key: str = ""
+    jev_timeout: float = 2.0
 
 settings = Settings()
 

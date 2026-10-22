@@ -1,3 +1,4 @@
+import httpx
 import pytest
 from app.guardrails import pipeline
 from app.guardrails.pipeline import check_input, check_output
@@ -25,17 +26,24 @@ def test_prompt_injection_blocked(q):
 def test_normal_question_allowed():
     assert check_input("what is the function of the lumbar region?").allowed
 
-class _FakeJudge:
-    def __init__(self, reply): self.reply = reply
-    def invoke(self, prompt): return type("Msg", (), {"content": self.reply})()
-
 def test_ungrounded_answer_blocked_stubbed(monkeypatch):
-    monkeypatch.setattr(pipeline, "get_chat_model", lambda: _FakeJudge("NO"))
+    monkeypatch.setattr(pipeline, "grounded_probability", lambda a, c: 0.0)
     assert check_output("The lumbar region has 9 vertebrae.", context="L1-L5, five vertebrae").reason == "ungrounded"
 
 def test_grounded_answer_allowed_stubbed(monkeypatch):
-    monkeypatch.setattr(pipeline, "get_chat_model", lambda: _FakeJudge("Yes."))
+    monkeypatch.setattr(pipeline, "grounded_probability", lambda a, c: 1.0)
     assert check_output("The lumbar region has five vertebrae.", context="L1-L5, five vertebrae").allowed
+
+@pytest.mark.parametrize("p, allowed", [(0.49, False), (0.5, True), (0.9, True)])
+def test_threshold_decides(monkeypatch, p, allowed):
+    monkeypatch.setattr(pipeline, "grounded_probability", lambda a, c: p)
+    monkeypatch.setattr(pipeline.settings, "judge_threshold", 0.5)
+    assert check_output("a", context="c").allowed is allowed
+
+def test_judge_failure_fails_closed(monkeypatch):
+    def boom(a, c): raise httpx.ConnectTimeout("slow")
+    monkeypatch.setattr(pipeline, "grounded_probability", boom)
+    assert check_output("a", context="c").reason == "judge_unavailable"
 
 def test_empty_context_blocked_without_llm_call():
     assert check_output("anything", context="  ").reason == "no_context"

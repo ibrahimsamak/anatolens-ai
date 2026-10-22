@@ -1,6 +1,8 @@
 import re
 from dataclasses import dataclass
-from app.llm.factory import get_chat_model
+import httpx
+from app.core.config import settings
+from app.guardrails.judge import grounded_probability
 
 @dataclass
 class GuardrailVerdict:
@@ -16,9 +18,6 @@ _INJECTION = re.compile(
 EDU_REDIRECT = ("I can only help with educational anatomy explanations, not medical advice. "
                 "Please consult a clinician. Would you like to learn how this structure works?")
 
-_JUDGE = ("You are a strict grounding checker. Answer only YES or NO: is EVERY factual claim in the "
-          "ANSWER supported by the CONTEXT?\n\nCONTEXT:\n{ctx}\n\nANSWER:\n{ans}")
-
 
 def check_input(question: str) -> GuardrailVerdict:
     if _INJECTION.search(question):
@@ -30,9 +29,10 @@ def check_input(question: str) -> GuardrailVerdict:
 def check_output(answer: str, context: str) -> GuardrailVerdict:
     if not context.strip():
         return GuardrailVerdict(False, "no_context")
-    verdict = get_chat_model().invoke(_JUDGE.format(ctx=context, ans=answer)).content.strip().upper()
-    
-    if not verdict.startswith("YES"):
+    try:
+        p = grounded_probability(answer, context)
+    except (httpx.HTTPError, KeyError, TypeError, ValueError):
+        return GuardrailVerdict(False, "judge_unavailable")
+    if p < settings.judge_threshold:
         return GuardrailVerdict(False, "ungrounded")
     return GuardrailVerdict(True)
-
