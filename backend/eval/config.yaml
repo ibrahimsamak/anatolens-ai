@@ -1,4 +1,3 @@
-chat_model: openai:gpt-4o-mini
 embedding_model: text-embedding-3-small
 datasets:
   rag: eval/datasets/rag_golden.jsonl
@@ -14,6 +13,11 @@ thresholds:
   rl_uplift_vs_logged: 0.10
 cost_per_1k:
   "openai:gpt-4o-mini": { input: 0.00015, output: 0.0006 }
+  "openai:gpt-4o": { input: 0.0025, output: 0.01 }
 rl_min_scored: 50
 mlflow_enabled: true
 langsmith_enabled: true
+routing:
+  cheap: openai:gpt-4o-mini
+  strong: openai:gpt-4o
+  reasoning_keywords: [why, explain, clinical, compare, mechanism, relationship, connects]

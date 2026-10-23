@@ -11,10 +11,11 @@ from eval.runners.guardrail_eval import run_guardrail_eval
 from eval.runners.rag_eval import run_rag_eval
 from eval.runners.recognition_eval import run_recognition_eval
 from eval.runners.rl_eval import run_rl_eval
+from app.llm.router import _CFG as ROUTING
 
 
 class EvalConfig(BaseModel):
-    chat_model: str; embedding_model: str
+    embedding_model: str
     datasets: dict[str, str]; thresholds: dict[str, float]
     cost_per_1k: dict; mlflow_enabled: bool = True; langsmith_enabled: bool = False
     rl_min_scored: int = 50
@@ -65,7 +66,8 @@ def run_all(cfg: EvalConfig) -> tuple[dict, dict[str, str]]:
 
 def _log_mlflow(cfg: EvalConfig, metrics: dict, skipped: dict[str, str]) -> None:
     with mlflow.start_run():
-        mlflow.log_params({"git_sha": _git_sha(), "model": cfg.chat_model})
+        # the models that actually answered: tutor answers are routed per question, judge/quiz use MODEL
+        mlflow.log_params({"git_sha": _git_sha(), "routing_cheap": ROUTING["cheap"], "routing_strong": ROUTING["strong"], "default_model": settings.model})
         mlflow.log_metrics({k: float(v) for k, v in metrics.items() if isinstance(v, (int, float))})
         mlflow.set_tags({f"skipped.{k}": v for k, v in skipped.items()})
 

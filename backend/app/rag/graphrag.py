@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from app.core.config import settings
 from app.rag.retriever import retrieve_chunks
 from app.rag.cache import SemanticCache
-from app.llm.factory import get_chat_model
+from app.llm.router import route_model, invoke_with_fallback, cheap_model
 from app.guardrails.pipeline import check_output
 
 NO_INFO = {"en": "I don't have verified information about that yet. Please ask your instructor.",
@@ -37,9 +37,7 @@ def explain_structure(structure_id, question, locale, db, graph, use_cache: bool
     if not chunks:
         return Explanation(NO_INFO.get(locale, NO_INFO["en"]), [], False)
     ctx = "\n".join(f"[{i+1}] {c.text} (src: {c.source})" for i, c in enumerate(chunks))
-    answer = get_chat_model().invoke(
-        _PROMPT.format(locale=locale, ctx = ctx, q=question or "Give an overview")
-    ).content
+    answer = invoke_with_fallback(_PROMPT.format(locale=locale, ctx = ctx, q=question or "Give an overview"), primary=route_model(question, structure_id), fallback=cheap_model())
     verdict = check_output(answer, ctx)
     if not verdict.allowed:
         return Explanation(NO_INFO.get(locale, NO_INFO["en"]), [], False)

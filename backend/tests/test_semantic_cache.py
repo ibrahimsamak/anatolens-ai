@@ -86,16 +86,16 @@ class Graph:
 
 class Model:
     def __init__(self): self.calls = 0
-    def invoke(self, prompt):
+    def __call__(self, prompt, primary, fallback):
         self.calls += 1
-        return type("R", (), {"content": "Five vertebrae [1]."})()
+        return "Five vertebrae [1]."
 
 @pytest.fixture
 def tutor(monkeypatch, make_cache):
     c, model = make_cache(), Model()
     monkeypatch.setattr(graphrag, "get_cache", lambda: c)
     monkeypatch.setattr(graphrag, "retrieve_chunks", lambda *a: [Chunk()])
-    monkeypatch.setattr(graphrag, "get_chat_model", lambda: model)
+    monkeypatch.setattr(graphrag, "invoke_with_fallback", model)
     monkeypatch.setattr(graphrag, "check_output", lambda a, ctx: GuardrailVerdict(True))
     return c, model
 
@@ -104,8 +104,7 @@ def test_second_similar_question_skips_the_llm(tutor):
     first = graphrag.explain_structure("spine.lumbar_region", "what is the lumbar region?", "en", None, Graph())
     again = graphrag.explain_structure("spine.lumbar_region", "what's the lumbar area?", "en", None, Graph())
     assert model.calls == 1 and again == first and again.grounded
-    assert c.emb.calls == 2   # one embedding per request: get and put share it
-
+    assert c.emb.calls == 2   
 def test_ungrounded_answer_is_not_cached(tutor, monkeypatch):
     c, _ = tutor
     monkeypatch.setattr(graphrag, "check_output", lambda a, ctx: GuardrailVerdict(False, "ungrounded"))

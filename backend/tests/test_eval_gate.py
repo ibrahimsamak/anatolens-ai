@@ -67,4 +67,6 @@ def test_mlflow_logs_run_with_git_sha(tmp_path, monkeypatch):
     finally:
         mlflow.set_tracking_uri(None)
     assert run.data.metrics == {"faithfulness": 0.9} and "git_sha" in run.data.params
+    assert run.data.params["routing_cheap"] == "openai:gpt-4o-mini" and run.data.params["routing_strong"] == "openai:gpt-4o"
+    assert run.data.params["default_model"] == settings.model and "model" not in run.data.params
     assert run.data.tags["skipped.judge_win_rate"] == "skip"
