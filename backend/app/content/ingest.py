@@ -5,6 +5,7 @@ from app.schemas.content import LessonSpec, StructureSpec, KnowledgeSpec
 from app.models.content import Lesson, Structure, KnowledgeChunk, Page
 from app.llm.factory import get_embeddings
 from app.recognition.pipeline import _phash
+from app.rag.graphrag import get_cache
 
 @dataclass
 class IngestReport:
@@ -47,4 +48,6 @@ def ingest_pack(path: str, db) -> IngestReport:
         ))
         
     db.commit()
+    if cache := get_cache(): 
+        cache.clear([s.id for s in structs])
     return IngestReport(lesson.id, len(structs), len(chunks))

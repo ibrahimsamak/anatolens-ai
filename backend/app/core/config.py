@@ -16,6 +16,8 @@ class Settings(BaseSettings):
     openai_api_key: str = ""
     database_url: str = ""
     redis_url: str = "redis://localhost:6379/0"
+    semantic_cache_enabled: bool = True
+    semantic_cache_threshold: float = 0.95
     recognition_auto_threshold: float = 0.95
     recognition_min_threshold: float = 0.80
     langsmith_api_key : str = ""

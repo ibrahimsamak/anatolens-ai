@@ -15,7 +15,7 @@ def run_rag_eval(cfg, db, graph)->dict:
         if not ctx:
             unanswerable += 1
             continue
-        e = explain_structure(r["structure_id"], r["question"], "en", db, graph)
+        e = explain_structure(r["structure_id"], r["question"], "en", db, graph, use_cache=False)
         records.append({"question": r["question"], "answer": e.text, "contexts": ctx, "ground_truth": r["gold"]})
     if not records:
         return {"faithfulness": 0.0, "answer_relevancy": 0.0, "context_recall": 0.0,

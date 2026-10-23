@@ -21,6 +21,7 @@ guardrails-ai
 imagehash
 pillow
 pyyaml
+redis>=5
 structlog
 prometheus-client
 opentelemetry-sdk
@@ -30,5 +31,6 @@ mlflow-skinny
 sse-starlette
 strawberry-graphql[fastapi]
 pytest
+fakeredis
 pytest-asyncio
 httpx

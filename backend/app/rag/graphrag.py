@@ -1,11 +1,7 @@
 from dataclasses import dataclass
+from app.core.config import settings
 from app.rag.retriever import retrieve_chunks
-from app.llm.factory import get_chat_model
-from app.guardrails.pipeline import check_output
-
-
-from dataclasses import dataclass
-from app.rag.retriever import retrieve_chunks
+from app.rag.cache import SemanticCache
 from app.llm.factory import get_chat_model
 from app.guardrails.pipeline import check_output
 
@@ -15,13 +11,27 @@ NO_INFO = {"en": "I don't have verified information about that yet. Please ask y
 @dataclass
 class Explanation:
     text: str; citations: list[str]; grounded: bool
-    
+
 _PROMPT = ("You are an anatomy tutor for students. Answer in {locale}. Use ONLY the context. "
            "Cite sources inline as [n]. Keep it clear and student-friendly.\n\n"
            "CONTEXT:\n{ctx}\n\nQUESTION: {q}")
 
+_cache: SemanticCache | None = None
 
-def explain_structure(structure_id, question, locale, db, graph) -> Explanation:
+def get_cache() -> SemanticCache | None:
+    global _cache
+    if not settings.semantic_cache_enabled:
+        return None
+    if _cache is None:
+        _cache = SemanticCache(settings.redis_url, threshold=settings.semantic_cache_threshold)
+    return _cache
+
+
+def explain_structure(structure_id, question, locale, db, graph, use_cache: bool = True) -> Explanation:
+    cache = get_cache() if use_cache else None
+    vec = cache.embed(question) if cache else None
+    if cache and (hit := cache.get(structure_id, question, locale, vec=vec)):
+        return Explanation(hit["answer"], hit["citations"], True)
     seed = [structure_id, *graph.neighbors(structure_id, hops=1)]
     chunks = retrieve_chunks(seed, question or "overview", locale, db)
     if not chunks:
@@ -33,5 +43,7 @@ def explain_structure(structure_id, question, locale, db, graph) -> Explanation:
     verdict = check_output(answer, ctx)
     if not verdict.allowed:
         return Explanation(NO_INFO.get(locale, NO_INFO["en"]), [], False)
-    return Explanation(answer, [c.source for c in chunks], True)
-
+    citations = [c.source for c in chunks]
+    if cache:
+        cache.put(structure_id, question, locale, answer, citations, vec=vec)
+    return Explanation(answer, citations, True)
