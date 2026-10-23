@@ -1,0 +1,55 @@
+name: ci
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      db:
+        image: pgvector/pgvector:pg16
+        env: { POSTGRES_USER: anatolens, POSTGRES_PASSWORD: anatolens, POSTGRES_DB: anatolens }
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U anatolens" --health-interval 5s --health-retries 10
+      redis: { image: redis:7, ports: ["6379:6379"] }
+    env:
+      DATABASE_URL: postgresql://anatolens:anatolens@localhost:5432/anatolens
+      REDIS_URL: redis://localhost:6379/0
+      MODEL: openai:gpt-4o-mini
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      MLFLOW_TRACKING_URI: sqlite:///mlflow.db
+    defaults:
+      run: { working-directory: backend }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11", cache: pip, cache-dependency-path: backend/requirements.txt }
+      - run: pip install -r requirements.txt ruff && pip install -e .
+      - name: lint
+        run: ruff check --select E9,F63,F7,F82 .
+      - run: alembic upgrade head
+      - name: unit tests
+        run: pytest -v -m "not integration"
+      - name: ingest content
+        if: ${{ env.OPENAI_API_KEY != '' }}
+        run: |
+          python -c "
+          from app.content.ingest import ingest_pack
+          from app.db.session import SessionLocal
+          for pack in ('spine', 'heart', 'digestive'):
+              with SessionLocal() as db: print(ingest_pack(f'../content/{pack}', db))
+          "
+      - name: integration tests
+        if: ${{ env.OPENAI_API_KEY != '' }}
+        run: pytest -v -m integration
+      - name: eval gate
+        if: ${{ env.OPENAI_API_KEY != '' }}
+        run: python -m eval.gate
+      - name: skip notice
+        if: ${{ env.OPENAI_API_KEY == '' }}
+        run: echo "::warning title=Eval gate skipped::OPENAI_API_KEY not set — ingest, integration tests and eval gate did NOT run (skipped, not passed)."
+      - name: upload eval runs
+        if: ${{ always() && env.OPENAI_API_KEY != '' }}
+        uses: actions/upload-artifact@v4
+        with: { name: mlflow-runs, path: backend/mlflow.db, if-no-files-found: ignore }

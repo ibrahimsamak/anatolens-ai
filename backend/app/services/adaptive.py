@@ -2,7 +2,7 @@ import uuid
 import numpy as np
 from sqlalchemy import select
 from app.models.content import Structure
-from app.models.learning import Progress, BanditEvent, Attempt
+from app.models.learning import Progress, BanditEvent, Attempt, QuizQuestion
 from app.rl.bandit import build_policy, rank
 from app.rl.features import build_feature_vector
 from app.services.quiz import generate_questions, grade
@@ -48,7 +48,6 @@ def next_question(user_id, lesson_id, db) -> "QuizQuestion | None":
     return None
 
 def record_result(user_id, question_id, answer, db) -> dict:
-    from app.models.learning import QuizQuestion
     q = db.get(QuizQuestion, question_id)
     correct = grade(question_id, answer, db)
     p = _progress(user_id, q.structure_id, db)

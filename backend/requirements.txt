@@ -12,6 +12,7 @@ langchain-core>=1.0
 langchain-openai>=1.0
 langchain-aws>=0.2
 langchain-text-splitters>=1.1
+langchain-community>=0.4,<0.4.2
 langsmith
 rdflib
 rank-bm25
@@ -21,6 +22,11 @@ imagehash
 pillow
 pyyaml
 structlog
+prometheus-client
+opentelemetry-sdk
+ragas>=0.4,<0.5
+datasets
+mlflow-skinny
 sse-starlette
 strawberry-graphql[fastapi]
 pytest

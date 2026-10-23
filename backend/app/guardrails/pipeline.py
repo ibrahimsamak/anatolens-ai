@@ -3,6 +3,7 @@ from dataclasses import dataclass
 import httpx
 from app.core.config import settings
 from app.guardrails.judge import grounded_probability
+from app.obs.metrics import GUARDRAIL_TRIGGERS
 
 @dataclass
 class GuardrailVerdict:
@@ -19,20 +20,25 @@ EDU_REDIRECT = ("I can only help with educational anatomy explanations, not medi
                 "Please consult a clinician. Would you like to learn how this structure works?")
 
 
+def _block(reason: str, redirect: str | None = None) -> GuardrailVerdict:
+    GUARDRAIL_TRIGGERS.labels(reason=reason).inc()
+    return GuardrailVerdict(False, reason, redirect)
+
+
 def check_input(question: str) -> GuardrailVerdict:
     if _INJECTION.search(question):
-        return GuardrailVerdict(False, "prompt_injection", EDU_REDIRECT)
+        return _block("prompt_injection", EDU_REDIRECT)
     if _MEDICAL_ADVICE.search(question):
-        return GuardrailVerdict(False, "medical_advice", EDU_REDIRECT)
+        return _block("medical_advice", EDU_REDIRECT)
     return GuardrailVerdict(True)
 
 def check_output(answer: str, context: str) -> GuardrailVerdict:
     if not context.strip():
-        return GuardrailVerdict(False, "no_context")
+        return _block("no_context")
     try:
         p = grounded_probability(answer, context)
     except (httpx.HTTPError, KeyError, TypeError, ValueError):
-        return GuardrailVerdict(False, "judge_unavailable")
+        return _block("judge_unavailable")
     if p < settings.judge_threshold:
-        return GuardrailVerdict(False, "ungrounded")
+        return _block("ungrounded")
     return GuardrailVerdict(True)

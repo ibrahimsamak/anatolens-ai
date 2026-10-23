@@ -11,6 +11,16 @@ services:
   redis:
     image: redis:7
     ports: ["6379:6379"]
-  
+
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v3.17.2
+    command: >-
+      mlflow server --host 0.0.0.0 --port 5000
+      --backend-store-uri sqlite:////mlflow/mlflow.db
+      --artifacts-destination /mlflow/artifacts
+    ports: ["5000:5000"]
+    volumes: ["mlflowdata:/mlflow"]
+
 volumes:
   pgdata:
+  mlflowdata:
