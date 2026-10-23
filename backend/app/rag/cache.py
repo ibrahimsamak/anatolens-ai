@@ -20,7 +20,7 @@ class SemanticCache:
 
     def embed(self, question: str) -> list[float]:
         return self.emb.embed_query(question or "overview")
-
+    
     def get(self, structure_id: str, question: str, locale: str, vec: list[float] | None = None):
         qv = np.array(vec if vec is not None else self.embed(question))
         try:
