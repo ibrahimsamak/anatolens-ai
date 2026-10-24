@@ -1,7 +1,7 @@
 import "@google/model-viewer";
 import { bestARMode, startPseudoAR } from "./ar";
 
-const API: string = import.meta.env.VITE_API ?? "http://localhost:8000";
+const API: string = import.meta.env.VITE_API ?? "";
 const LESSON = new URLSearchParams(location.search).get("lesson") ?? "spine_001";
 
 type Structure = { id: string; mesh_name: string; name_en: string; name_ar: string | null };
@@ -34,7 +34,7 @@ async function init() {
   try {
     const lesson = await getJSON<{ title: string; model_url: string; ios_model_url: string | null }>(
       `${API}/api/v1/lessons/${LESSON}`);
-    $("lesson-title").textContent = `· ${lesson.title}`;
+    document.title = `${lesson.title} · AnatoLens`;
     mv.src = lesson.model_url;
     if (lesson.ios_model_url) mv.iosSrc = lesson.ios_model_url;
 
@@ -155,6 +155,7 @@ type QuizResult = { correct: boolean; mastery: number; reward: number };
 type ProgressRow = { structure_id: string; mastery: number; attempts: number };
 
 const USER = new URLSearchParams(location.search).get("user") ?? "demo-user";
+$("results-link").setAttribute("href", `/results.html?${new URLSearchParams({ user: USER, lesson: LESSON })}`);
 
 async function postJSON<T>(url: string, body: unknown): Promise<T> {
   const r = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
@@ -247,4 +248,105 @@ async function setupAR() {
   btn.hidden = false;
 }
 
+type ScanResult = { lesson_id: string | null; confidence: number; decision: "auto" | "confirm" | "rescan" };
+
+let scanStream: MediaStream | null = null;
+
+function setScanStatus(text: string, cls = "") {
+  const s = $("scan-status");
+  s.textContent = text;
+  s.className = cls;
+}
+
+async function openScan() {
+  $("scan").hidden = false;
+  $("scan-open").hidden = true;
+  setScanStatus("Point the camera at a lesson page");
+  const video = $<HTMLVideoElement>("scan-video"), capture = $<HTMLButtonElement>("scan-capture");
+  try {
+    scanStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false });
+    video.srcObject = scanStream;
+    await video.play();
+    capture.hidden = false;
+  } catch {
+    capture.hidden = true;
+    setScanStatus("Camera not available here. Use “Upload photo” instead.", "error");
+  }
+}
+
+function closeScan() {
+  scanStream?.getTracks().forEach(t => t.stop());
+  scanStream = null;
+  $<HTMLVideoElement>("scan-video").srcObject = null;
+  $("scan").hidden = true;
+}
+
+function captureFrame(): Promise<Blob> {
+  const video = $<HTMLVideoElement>("scan-video");
+  const canvas = document.createElement("canvas");
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext("2d")!.drawImage(video, 0, 0);
+  return new Promise((ok, fail) => canvas.toBlob(b => (b ? ok(b) : fail(new Error("capture failed"))), "image/jpeg", 0.92));
+}
+
+async function recognize(image: Blob) {
+  const open = $<HTMLButtonElement>("scan-open");
+  open.hidden = true;
+  setScanStatus("Recognizing…");
+  try {
+    const form = new FormData();
+    form.append("file", image, "scan.jpg");
+    const r = await fetch(`${API}/api/v1/recognition/page`, { method: "POST", body: form });
+    if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
+    const res: ScanResult = await r.json();
+    const pct = Math.round(res.confidence * 100);
+    if (!res.lesson_id || res.decision === "rescan") {
+      setScanStatus(`No lesson recognized (${pct}% match). Hold the page straight and fill the frame, then try again.`, "error");
+      return;
+    }
+    const goto = () => { location.search = `?lesson=${encodeURIComponent(res.lesson_id!)}`; };
+    if (res.decision === "auto") {
+      setScanStatus(`Found ${res.lesson_id} (${pct}% match). Opening…`, "ok");
+      closeScan();
+      goto();
+      return;
+    }
+    const title = await getJSON<{ title: string }>(`${API}/api/v1/lessons/${res.lesson_id}`)
+      .then(l => l.title).catch(() => res.lesson_id!);
+    setScanStatus(`Is this “${title}”? (${pct}% match)`);
+    open.onclick = () => { closeScan(); goto(); };
+    open.hidden = false;
+  } catch (e) {
+    setScanStatus(`Scan failed (${(e as Error).message})`, "error");
+  }
+}
+
+async function setupLessonPicker() {
+  const select = $<HTMLSelectElement>("lesson-select");
+  try {
+    const lessons = await getJSON<{ id: string; title: string }[]>(`${API}/api/v1/lessons`);
+    select.replaceChildren(...lessons.map(l => new Option(l.title, l.id, false, l.id === LESSON)));
+    if (!lessons.some(l => l.id === LESSON)) select.prepend(new Option(LESSON, LESSON, true, true));
+  } catch {
+    select.replaceChildren(new Option(LESSON, LESSON));
+    select.disabled = true;
+  }
+  select.onchange = () => {
+    const qs = new URLSearchParams(location.search);
+    qs.set("lesson", select.value);
+    location.search = `?${qs}`;
+  };
+}
+
+$("scan-btn").onclick = openScan;
+$("scan-close").onclick = closeScan;
+$("scan-capture").onclick = async () => recognize(await captureFrame());
+$<HTMLInputElement>("scan-file").onchange = e => {
+  const input = e.target as HTMLInputElement, file = input.files?.[0];
+  if (file) recognize(file);
+  input.value = "";
+};
+
+setupLessonPicker();
 init();

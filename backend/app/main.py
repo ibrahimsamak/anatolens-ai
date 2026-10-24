@@ -7,7 +7,7 @@ from strawberry.fastapi import GraphQLRouter
 from app.core.logging import configure_logging
 from app.api import recognition, lessons, tutor, quiz
 from app.api.graphql_schema import schema, get_context
-from app.obs.tracing import setup_tracing, tracer
+from app.obs.tracing import setup_tracing, setup_mlflow, tracer
 from app.obs.metrics import REQUEST_LATENCY
 from prometheus_client import make_asgi_app
 
@@ -16,6 +16,7 @@ app = FastAPI(title="AnatoLens AI")
 
 
 setup_tracing()
+setup_mlflow()
 class TimingMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request, call_next):
         t = time.perf_counter()

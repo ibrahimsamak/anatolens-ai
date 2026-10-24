@@ -24,6 +24,9 @@ class Settings(BaseSettings):
     langsmith_project : str = ""
     langsmith_auto_threshold: float = 0.95
     langsmith_min_threshold: float = 0.80
+    mlflow_tracing: bool = False
+    mlflow_tracking_uri: str = ""
+    mlflow_experiment: str = "anatolens-tutor"
     judge_backend: Literal["llm", "jev"] = "llm"
     judge_threshold: float = 0.5
     jev_url: str = ""

@@ -12,5 +12,20 @@ def setup_tracing(service_name: str = "anatolens") -> None:
         provider.add_span_processor(BatchSpanProcessor(ConsoleSpanExporter()))
     trace.set_tracer_provider(provider)
 
+def setup_mlflow() -> None:
+    import logging
+    import mlflow
+    from app.core.config import settings
+    if not (settings.mlflow_tracing and settings.mlflow_tracking_uri):
+        mlflow.tracing.disable()
+        return
+    try:
+        mlflow.set_tracking_uri(settings.mlflow_tracking_uri)
+        mlflow.set_experiment(settings.mlflow_experiment)
+        mlflow.langchain.autolog()
+    except Exception as e:
+        mlflow.tracing.disable()
+        logging.getLogger(__name__).warning("MLflow tracing disabled: %s", e)
+
 def tracer() -> trace.Tracer:
     return trace.get_tracer("anatolens")

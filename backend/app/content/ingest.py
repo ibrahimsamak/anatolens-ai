@@ -28,6 +28,7 @@ def ingest_pack(path: str, db) -> IngestReport:
     for preview in sorted((root / "assets").glob("*_preview.png")):
         db.merge(Page(id=f"{lesson.id}:{preview.stem}", lesson_id=lesson.id,
                       phash=_phash(preview.read_bytes()), embedding=[0.0] * 512))
+    db.flush()
 
     emb = get_embeddings()
     chunks = [KnowledgeSpec(**k) for k in _load(root/"knowledge.en.yaml")]

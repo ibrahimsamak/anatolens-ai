@@ -1,4 +1,6 @@
 from dataclasses import dataclass
+import mlflow
+from mlflow.entities import SpanType
 from app.core.config import settings
 from app.rag.retriever import retrieve_chunks
 from app.rag.cache import SemanticCache
@@ -28,6 +30,14 @@ def get_cache() -> SemanticCache | None:
 
 
 def explain_structure(structure_id, question, locale, db, graph, use_cache: bool = True) -> Explanation:
+    with mlflow.start_span(name="explain_structure", span_type=SpanType.CHAIN) as span:
+        span.set_inputs({"structure_id": structure_id, "question": question, "locale": locale})
+        e = _explain_structure(structure_id, question, locale, db, graph, use_cache)
+        span.set_outputs({"text": e.text, "citations": e.citations, "grounded": e.grounded})
+        return e
+
+
+def _explain_structure(structure_id, question, locale, db, graph, use_cache: bool) -> Explanation:
     cache = get_cache() if use_cache else None
     vec = cache.embed(question) if cache else None
     if cache and (hit := cache.get(structure_id, question, locale, vec=vec)):

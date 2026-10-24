@@ -9,8 +9,10 @@ async def test_next_then_submit():
         res = await c.post("/api/v1/quiz/submit",
                            json={"user_id": "u1", "question_id": nq["id"], "answer": nq["correct"]})
         prog = (await c.get("/api/v1/progress/u1")).json()
+        hist = (await c.get("/api/v1/history/u1")).json()
     assert res.json()["correct"] is True
     assert any(p["structure_id"] == nq["structure_id"] and p["attempts"] >= 1 for p in prog)
+    assert hist[0]["prompt"] == nq["prompt"] and hist[0]["correct"] is True
 
 @pytest.mark.integration
 async def test_submit_unknown_question_404():

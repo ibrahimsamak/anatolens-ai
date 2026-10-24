@@ -1,8 +1,11 @@
 import { test, expect, type Page } from "@playwright/test";
 
-const API = "http://localhost:8000/api/v1";
+const API = "**/api/v1";
 
 async function mockBackend(page: Page) {
+  await page.route(`${API}/lessons`, r => r.fulfill({ json: [
+    { id: "heart_001", title: "The Heart", system: "cardiovascular" },
+    { id: "spine_001", title: "Vertebral Column", system: "skeletal" } ] }));
   await page.route(`${API}/lessons/spine_001`, r => r.fulfill({ json: {
     id: "spine_001", title: "Vertebral Column", model_url: "/assets/spine.glb", ios_model_url: "/assets/spine.usdz" } }));
   await page.route(`${API}/lessons/spine_001/structures`, r => r.fulfill({ json: [
@@ -18,7 +21,8 @@ async function mockBackend(page: Page) {
 test("loads spine and explains lumbar (mocked API)", async ({ page }) => {
   await mockBackend(page);
   await page.goto("/");
-  await expect(page.locator("#lesson-title")).toContainText("Vertebral Column");
+  await expect(page.locator("#lesson-select")).toHaveValue("spine_001");
+  await expect(page.locator("#lesson-select option:checked")).toHaveText("Vertebral Column");
   await expect(page.locator('.hotspot[data-sid="spine.lumbar_region"]')).toHaveAttribute("data-position", /m/);
   await page.locator("#panel").getByRole("button", { name: /Lumbar/i }).click();
   await expect(page.locator("#card")).toContainText(/lumbar/i);

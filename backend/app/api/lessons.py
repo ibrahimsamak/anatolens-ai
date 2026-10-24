@@ -5,6 +5,11 @@ from app.models.content import Lesson, Structure
 router = APIRouter(prefix="/api/v1")
 
 
+@router.get("/lessons")
+def list_lessons(db=Depends(get_db)):
+    rows = db.execute(select(Lesson).order_by(Lesson.title)).scalars().all()
+    return [{"id": l.id, "title": l.title, "system": l.system} for l in rows]
+
 @router.get("/lessons/{lesson_id}")
 def get_lesson(lesson_id: str, db=Depends(get_db)):
     lesson = db.get(Lesson, lesson_id)
