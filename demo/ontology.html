@@ -69,7 +69,6 @@ button:hover { background: color-mix(in srgb, var(--accent2) 22%, transparent); 
 button:active { transform: scale(.96); }
 button[aria-pressed="true"] { background: linear-gradient(135deg, var(--accent3), var(--accent) 60%, var(--accent2)); color: #fff;
                               box-shadow: 0 3px 12px color-mix(in srgb, var(--accent) 40%, transparent); }
-#relayout { background: linear-gradient(135deg, var(--accent2), var(--accent)); color: #111; font-weight: 600; }
 button:focus-visible, .node:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 main { flex: 1; display: flex; min-height: 0; }
 #stage { flex: 1; position: relative; min-width: 0;
@@ -155,17 +154,19 @@ svg.selecting .edge.lit { opacity: 1; stroke-width: 3.2; filter: url(#glow); }
   #stage { min-height: 60vh; }
   aside { width: auto; border-left: 0; border-top: 1px solid var(--line); }
 }
+.home { color: var(--ink); text-decoration: none; font-size: 13px; border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; }
+.home:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 </style>
 </head>
 <body>
 <header>
+  <a class="home" href="/">← Demo</a>
   <h1><span class="logo" aria-hidden="true"></span><b>AnatoLens ontology</b> <span class="sub">· structures.yaml relations</span></h1>
   <div class="group" id="lessons" role="group" aria-label="Lesson"><label>Lesson</label></div>
   <div class="group" role="group" aria-label="GraphRAG hops"><label>Hops</label>
     <button data-hops="1" aria-pressed="true">1</button><button data-hops="2" aria-pressed="false">2</button></div>
   <div class="group" role="group" aria-label="Label language"><label>Labels</label>
     <button data-lang="en" aria-pressed="true">EN</button><button data-lang="ar" aria-pressed="false">AR</button></div>
-  <div class="group"><button id="relayout">Re-layout</button></div>
 </header>
 <main>
   <div id="stage">
@@ -532,11 +533,6 @@ document.querySelectorAll("[data-lang]").forEach(b => b.onclick = () => {
   document.querySelectorAll("[data-lang]").forEach(x => x.setAttribute("aria-pressed", x === b));
   setLabels();
 });
-$("#relayout").onclick = () => {
-  const { width, height } = svg.getBoundingClientRect();
-  nodes.forEach(n => { n.x = width / 2 + (Math.random() - .5) * 300; n.y = height / 2 + (Math.random() - .5) * 300; });
-  kick(1);
-};
 window.addEventListener("resize", () => kick(.3));
 (() => {
   const c = document.createElement("canvas"); c.width = c.height = 64;

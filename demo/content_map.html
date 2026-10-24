@@ -124,10 +124,13 @@ ul.rels li { padding: 3px 0; }
 a.jump { color: var(--ink); cursor: pointer; text-decoration: underline; text-decoration-color: var(--line); }
 @media (prefers-reduced-motion: reduce) { .cell, #drawer, .wire { transition: none; } }
 @media (max-width: 700px) { #side { width: 220px; } }
+.home { color: var(--ink); text-decoration: none; font-size: 13px; border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; }
+.home:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 </style>
 </head>
 <body>
 <header>
+  <a class="home" href="/">← Demo</a>
   <h1>AnatoLens content map <span>· content/&lt;lesson&gt;/*.yaml</span></h1>
   <div class="group" id="tabs" role="group" aria-label="Lesson"></div>
   <div id="summary"></div>
