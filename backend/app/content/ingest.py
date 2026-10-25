@@ -5,6 +5,7 @@ from app.schemas.content import LessonSpec, StructureSpec, KnowledgeSpec
 from app.models.content import Lesson, Structure, KnowledgeChunk, Page
 from app.llm.factory import get_embeddings
 from app.recognition.pipeline import _phash
+from app.recognition.embedder import open_image, embed_image
 from app.rag.graphrag import get_cache
 
 @dataclass
@@ -25,9 +26,13 @@ def ingest_pack(path: str, db) -> IngestReport:
     for s in structs:
         db.merge(Structure(id=s.id, lesson_id=lesson.id, mesh_name=s.mesh_name, display_name_en=s.display_name_en, display_name_ar=s.display_name_ar))
     
-    for preview in sorted((root / "assets").glob("*_preview.png")):
-        db.merge(Page(id=f"{lesson.id}:{preview.stem}", lesson_id=lesson.id,
-                      phash=_phash(preview.read_bytes()), embedding=[0.0] * 512))
+    db.query(Page).filter_by(lesson_id=lesson.id).delete()
+    refs = [*sorted((root / "assets").glob("*_preview.png")), *sorted((root / "assets" / "recognition").glob("*.*"))]
+    for ref in refs:
+        img = open_image(ref.read_bytes())
+        if img is None:
+            continue
+        db.add(Page(id=f"{lesson.id}:{ref.stem}", lesson_id=lesson.id, phash=_phash(img), embedding=embed_image(img)))
     db.flush()
 
     emb = get_embeddings()

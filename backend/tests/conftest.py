@@ -7,6 +7,7 @@ from app.content.ingest import _load
 from app.db.session import SessionLocal
 from app.models.content import Lesson, Page
 from app.recognition.pipeline import _phash
+from app.recognition.embedder import open_image, embed_image
 from app.schemas.content import LessonSpec
 
 CONTENT = Path(__file__).resolve().parents[2] / "content"
@@ -19,8 +20,9 @@ def spine_page_image_bytes():
     with SessionLocal() as db:
         lesson = LessonSpec(**_load(CONTENT / "spine" / "lesson.yaml"))
         db.merge(Lesson(**lesson.model_dump()))
+        img = open_image(image_bytes)
         db.merge(Page(id=SPINE_PAGE_ID, lesson_id=lesson.id,
-                      phash=_phash(image_bytes), embedding=[0.0] * 512))
+                      phash=_phash(img), embedding=embed_image(img)))
         db.commit()
     yield image_bytes
     with SessionLocal() as db:

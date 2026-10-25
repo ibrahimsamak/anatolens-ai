@@ -19,6 +19,7 @@ rank-bm25
 mabwiser>=2.7       
 guardrails-ai
 imagehash
+fastembed
 pillow
 pyyaml
 redis>=5

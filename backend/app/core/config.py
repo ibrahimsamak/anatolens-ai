@@ -18,8 +18,14 @@ class Settings(BaseSettings):
     redis_url: str = "redis://localhost:6379/0"
     semantic_cache_enabled: bool = True
     semantic_cache_threshold: float = 0.95
-    recognition_auto_threshold: float = 0.95
-    recognition_min_threshold: float = 0.80
+    recognition_model: str = "Qdrant/Unicom-ViT-B-32"
+    recognition_auto_threshold: float = 0.45
+    recognition_min_threshold: float = 0.35
+    recognition_margin: float = 0.08
+    recognition_exact_threshold: float = 0.95
+    recognition_semantic_model: str = "Qdrant/clip-ViT-B-32"
+    recognition_semantic_auto: float = 0.85
+    recognition_semantic_min: float = 0.5
     langsmith_api_key : str = ""
     langsmith_project : str = ""
     langsmith_auto_threshold: float = 0.95
