@@ -232,20 +232,24 @@ $("quiz-next").onclick = quiz;
 async function setupAR() {
   await customElements.whenDefined("model-viewer");
   const mode = await bestARMode(mv);
-  const btn = $<HTMLButtonElement>("ar-btn");
   if (mode === "webxr" || mode === "native") {
+    const btn = $<HTMLButtonElement>("ar-btn");
     btn.textContent = "View in AR";
     btn.onclick = () => mv.activateAR();
-  } else if (mode === "pseudo") {
+    btn.hidden = false;
+  }
+  // Quick Look / Scene Viewer can't show the HTML hotspots, so offer the camera view (which keeps them) alongside.
+  const hasCamera = typeof navigator.mediaDevices?.getUserMedia === "function";
+  if (mode === "pseudo" || (mode === "native" && hasCamera)) {
+    const cam = $<HTMLButtonElement>("camera-btn");
     let stop: (() => void) | null = null;
-    btn.textContent = "Camera view";
-    btn.onclick = async () => {
-      if (stop) { stop(); stop = null; btn.textContent = "Camera view"; return; }
-      try { stop = await startPseudoAR($("camera")); btn.textContent = "Stop camera"; }
+    cam.onclick = async () => {
+      if (stop) { stop(); stop = null; cam.textContent = "Camera view"; return; }
+      try { stop = await startPseudoAR($("camera")); cam.textContent = "Stop camera"; }
       catch { setStatus("Camera permission denied", true); }
     };
-  } else return;
-  btn.hidden = false;
+    cam.hidden = false;
+  }
 }
 
 type ScanResult = { lesson_id: string | null; confidence: number; decision: "auto" | "confirm" | "rescan" };
@@ -300,21 +304,20 @@ async function recognize(image: Blob) {
     const r = await fetch(`${API}/api/v1/recognition/page`, { method: "POST", body: form });
     if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
     const res: ScanResult = await r.json();
-    const pct = Math.round(res.confidence * 100);
     if (!res.lesson_id || res.decision === "rescan") {
-      setScanStatus(`No lesson recognized (${pct}% match). Hold the page straight and fill the frame, then try again.`, "error");
+      setScanStatus("No lesson recognized. Fill the frame with the figure and try again.", "error");
       return;
     }
     const goto = () => { location.search = `?lesson=${encodeURIComponent(res.lesson_id!)}`; };
     if (res.decision === "auto") {
-      setScanStatus(`Found ${res.lesson_id} (${pct}% match). Opening…`, "ok");
+      setScanStatus(`Found ${res.lesson_id}. Opening…`, "ok");
       closeScan();
       goto();
       return;
     }
     const title = await getJSON<{ title: string }>(`${API}/api/v1/lessons/${res.lesson_id}`)
       .then(l => l.title).catch(() => res.lesson_id!);
-    setScanStatus(`Is this “${title}”? (${pct}% match)`);
+    setScanStatus(`Is this “${title}”?`);
     open.onclick = () => { closeScan(); goto(); };
     open.hidden = false;
   } catch (e) {
