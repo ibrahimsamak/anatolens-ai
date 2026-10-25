@@ -1,5 +1,6 @@
 import sys, json, numpy as np, trimesh
 from trimesh.visual.material import PBRMaterial
+from anchors import anchor, model_frame
 OBJ, OUT = sys.argv[1], sys.argv[2]
 FJ = lambda *a: [f"FJ{n}" for n in a]
 
@@ -71,16 +72,13 @@ def build(name, spec):
     lo, hi = allb.min(0), allb.max(0)
     shift = np.array([-(lo[0] + hi[0]) / 2, -lo[1], -(lo[2] + hi[2]) / 2])
     scene, hotspots = trimesh.Scene(), {}
-    for node, m in meshes.items():
+    for m in meshes.values():
         m.apply_translation(shift)
+    center, radius, slender = model_frame([m.vertices for m in meshes.values()])
+    for node, m in meshes.items():
         scene.add_geometry(m, node_name=node, geom_name=node)
-        v, (b0, b1) = m.vertices, m.bounds
-        cy, h = (b0[1] + b1[1]) / 2, b1[1] - b0[1]
-        band = np.where(np.abs(v[:, 1] - cy) <= max(h * 0.15, 0.003))[0]
-        i = band[np.argmax(v[band, 2])]
-        hotspots[node] = {"position": [round(float(x), 4) for x in v[i]],
-                          "normal": [round(float(x), 4) for x in m.vertex_normals[i]],
-                          "triangles": int(len(m.faces))}
+        pos, nrm = anchor(m.vertices, center, radius, slender)
+        hotspots[node] = {"position": pos, "normal": nrm, "triangles": int(len(m.faces))}
     path = f"{OUT}/{name}.glb"
     scene.export(path)
     size = (hi - lo) * 1
