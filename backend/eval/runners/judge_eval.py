@@ -1,5 +1,6 @@
 import json
 from app.llm.factory import get_chat_model
+from app.rl.dpo_collect import save_pairs
 
 _RUBRIC = ("Judge which anatomy answer is more accurate, grounded, and student-friendly. "
            "Reply with exactly 'A' or 'B'.\nQUESTION: {q}\n\nA:\n{a}\n\nB:\n{b}")
@@ -19,10 +20,14 @@ def judge_pairwise(question, answer_a, answer_b)->str:
     if a_vode == 0: return "B"
     return "TIE"
 
-def run_judge_eval(cfg, candidate_fn, baseline_fn, rows) -> dict:
+def run_judge_eval(cfg, candidate_fn, baseline_fn, rows, db=None) -> dict:
     wins = n = 0
     for r in rows:
-        res = judge_pairwise(r["question"], candidate_fn(r), baseline_fn(r))
+        a, b = candidate_fn(r), baseline_fn(r)
+        res = judge_pairwise(r["question"], a, b)
+        if db is not None and res != "TIE":          # a tie teaches nothing
+            win, lose = (a, b) if res == "A" else (b, a)
+            save_pairs(db, r["question"], [win], [lose], source="eval_pairwise")
         wins += 1 if res == "A" else (0.5 if res == "TIE" else 0); n += 1
     return {"win_rate": wins / n if n else 0.0, "n": n}
 
