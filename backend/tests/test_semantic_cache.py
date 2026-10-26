@@ -86,7 +86,7 @@ class Graph:
 
 class Model:
     def __init__(self): self.calls = 0
-    def __call__(self, prompt, primary, fallback):
+    def __call__(self, prompt, primary, fallback, temperature=0):
         self.calls += 1
         return "Five vertebrae [1]."
 
