@@ -42,6 +42,7 @@ class Settings(BaseSettings):
     tutor_candidates: int = 3
     tutor_candidate_temperature: float = 0.7
     dpo_collect: bool = False
+    knowledge_source: Literal["direct", "mcp"] = "direct"
 settings = Settings()
 
 def sqlalchemy_database_url() -> str:

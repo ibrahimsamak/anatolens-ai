@@ -9,9 +9,13 @@ from app.llm.router import route_model, invoke_with_fallback, cheap_model
 from app.guardrails.pipeline import check_output
 from app.rl.reranker import get_reranker
 from app.rl.dpo_collect import save_pairs
+from app.agents.mcp_tools import search_knowledge_via_mcp, KnowledgeServiceUnavailable, KnowledgeToolError
 
 NO_INFO = {"en": "I don't have verified information about that yet. Please ask your instructor.",
            "ar": "لا تتوفر لديّ معلومات موثّقة عن ذلك بعد. يرجى سؤال المدرّس."}
+
+KNOWLEDGE_DOWN = {"en": "The anatomy knowledge service is unavailable right now. Please try again shortly.",
+                  "ar": "خدمة المعرفة التشريحية غير متاحة حالياً. يرجى المحاولة بعد قليل."}
 
 @dataclass
 class Explanation:
@@ -30,6 +34,12 @@ def get_cache() -> SemanticCache | None:
     if _cache is None:
         _cache = SemanticCache(settings.redis_url, threshold=settings.semantic_cache_threshold)
     return _cache
+
+
+def _retrieve(seed, query, locale, db):
+    if settings.knowledge_source == "mcp":
+        return search_knowledge_via_mcp(seed, query, locale)
+    return retrieve_chunks(seed, query, locale, db)
 
 
 def _candidates(prompt: str, primary: str, n: int) -> list[str]:
@@ -66,7 +76,12 @@ def _explain_structure(structure_id, question, locale, db, graph, use_cache: boo
     if cache and (hit := cache.get(structure_id, question, locale, vec=vec)):
         return Explanation(hit["answer"], hit["citations"], True)
     seed = [structure_id, *graph.neighbors(structure_id, hops=1)]
-    chunks = retrieve_chunks(seed, question or "overview", locale, db)
+    try:
+        chunks = _retrieve(seed, question or "overview", locale, db)
+    except KnowledgeServiceUnavailable:
+        return Explanation(KNOWLEDGE_DOWN.get(locale, KNOWLEDGE_DOWN["en"]), [], False)
+    except KnowledgeToolError:
+        chunks = []
     if not chunks:
         return Explanation(NO_INFO.get(locale, NO_INFO["en"]), [], False)
     ctx = "\n".join(f"[{i+1}] {c.text} (src: {c.source})" for i, c in enumerate(chunks))

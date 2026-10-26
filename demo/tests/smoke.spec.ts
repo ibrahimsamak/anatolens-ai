@@ -111,6 +111,47 @@ test("clicking the bone itself selects it, shows its label and highlights it (mo
   expect(glow["Spine_Sacral_mat"]).toBe(false);
 });
 
+async function mockHeart(page: Page) {
+  await mockBackend(page);
+  await page.route(`${API}/lessons/heart_001`, r => r.fulfill({ json: {
+    id: "heart_001", title: "The Heart", model_url: "/assets/heart.glb", ios_model_url: "/assets/heart.usdz" } }));
+  await page.route(`${API}/lessons/heart_001/structures`, r => r.fulfill({ json: [
+    { id: "heart.left_ventricle", mesh_name: "Heart_LeftVentricle", name_en: "Left ventricle", name_ar: null },
+    { id: "heart.right_ventricle", mesh_name: "Heart_RightVentricle", name_en: "Right ventricle", name_ar: null },
+    { id: "heart.mitral_valve", mesh_name: "Heart_MitralValve", name_en: "Mitral valve", name_ar: null } ] }));
+}
+
+test("clicking the heart's left ventricle selects it and only it glows (mocked API)", async ({ page }) => {
+  await mockHeart(page);
+  await page.goto("/?lesson=heart_001");
+  const p = await pointOnPart(page, "Heart_LeftVentricle_mat");
+  expect(p, "left ventricle should be visible on the heart model").not.toBeNull();
+  await page.mouse.click(p!.x, p!.y);
+  await expect(page.locator("#card-title")).toHaveText("Left ventricle");
+  const glow = await page.evaluate(() => Object.fromEntries((document.getElementById("mv") as any).model.materials
+    .map((m: any) => [m.name, m.emissiveFactor.some((v: number) => v > 0)])));
+  expect(glow["Heart_LeftVentricle_mat"]).toBe(true);
+  expect(glow["Heart_RightVentricle_mat"]).toBe(false);
+});
+
+test("a heart valve hidden behind a chamber is still reachable from the side panel (mocked API)", async ({ page }) => {
+  await mockHeart(page);
+  await page.goto("/?lesson=heart_001");
+  await page.locator("#panel").getByRole("button", { name: /Mitral valve/i }).click();
+  await expect(page.locator("#card-title")).toHaveText("Mitral valve");
+});
+
+test("dragging the heart to rotate it does not select a part", async ({ page }) => {
+  await mockHeart(page);
+  await page.goto("/?lesson=heart_001");
+  const p = await pointOnPart(page, "Heart_LeftVentricle_mat");
+  await page.mouse.move(p!.x, p!.y);
+  await page.mouse.down();
+  await page.mouse.move(p!.x + 80, p!.y, { steps: 5 });
+  await page.mouse.up();
+  await expect(page.locator("#card")).toBeHidden();
+});
+
 test("dragging to rotate the model does not select a part", async ({ page }) => {
   await mockBackend(page);
   await page.goto("/");
