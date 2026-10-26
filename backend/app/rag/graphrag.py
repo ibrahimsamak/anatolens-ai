@@ -74,7 +74,8 @@ def _explain_structure(structure_id, question, locale, db, graph, use_cache: boo
     prompt = _PROMPT.format(locale=locale, ctx=ctx, q=q)
     reranker = get_reranker()
     n = settings.tutor_candidates if (reranker.active or settings.dpo_collect) else 1
-    ranked = reranker.rank(q, _candidates(prompt, route_model(question, structure_id), n))
+    candidates = _candidates(prompt, route_model(question, structure_id), n)
+    ranked = reranker.rank(q, candidates)
     if settings.dpo_collect and len(ranked) > 1:
         ok = {c: check_output(c, ctx).allowed for c in ranked}
         good = [c for c in ranked if ok[c]]
