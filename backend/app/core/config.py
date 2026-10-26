@@ -43,6 +43,8 @@ class Settings(BaseSettings):
     tutor_candidate_temperature: float = 0.7
     dpo_collect: bool = False
     knowledge_source: Literal["direct", "mcp"] = "direct"
+    tutor_mode: Literal["pipeline", "agent"] = "pipeline"
+    agent_max_steps: int = 6
 settings = Settings()
 
 def sqlalchemy_database_url() -> str:

@@ -2,6 +2,7 @@ import asyncio, json, os, sys
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from types import SimpleNamespace
+from langchain_mcp_adapters.client import MultiServerMCPClient
 
 BACKEND = Path(__file__).resolve().parents[2]
 
@@ -21,7 +22,6 @@ def connections() -> dict:
         "env": dict(os.environ)}}
 
 def _client():
-    from langchain_mcp_adapters.client import MultiServerMCPClient
     return MultiServerMCPClient(connections())
 
 async def load_mcp_tools():

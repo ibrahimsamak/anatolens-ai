@@ -1,5 +1,6 @@
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
+from app.agents.tool_agent import run_agent
 import mlflow
 from mlflow.entities import SpanType
 from app.core.config import settings
@@ -75,21 +76,31 @@ def _explain_structure(structure_id, question, locale, db, graph, use_cache: boo
     vec = cache.embed(question) if cache else None
     if cache and (hit := cache.get(structure_id, question, locale, vec=vec)):
         return Explanation(hit["answer"], hit["citations"], True)
-    seed = [structure_id, *graph.neighbors(structure_id, hops=1)]
-    try:
-        chunks = _retrieve(seed, question or "overview", locale, db)
-    except KnowledgeServiceUnavailable:
-        return Explanation(KNOWLEDGE_DOWN.get(locale, KNOWLEDGE_DOWN["en"]), [], False)
-    except KnowledgeToolError:
-        chunks = []
-    if not chunks:
-        return Explanation(NO_INFO.get(locale, NO_INFO["en"]), [], False)
-    ctx = "\n".join(f"[{i+1}] {c.text} (src: {c.source})" for i, c in enumerate(chunks))
     q = question or "Give an overview"
-    prompt = _PROMPT.format(locale=locale, ctx=ctx, q=q)
     reranker = get_reranker()
-    n = settings.tutor_candidates if (reranker.active or settings.dpo_collect) else 1
-    candidates = _candidates(prompt, route_model(question, structure_id), n)
+    if settings.tutor_mode == "agent":
+        try:
+            answer, chunks = run_agent(structure_id, q, locale)
+        except KnowledgeServiceUnavailable:
+            return Explanation(KNOWLEDGE_DOWN.get(locale, KNOWLEDGE_DOWN["en"]), [], False)
+        if not chunks or not answer.strip():
+            return Explanation(NO_INFO.get(locale, NO_INFO["en"]), [], False)
+        candidates = [answer]
+    else:
+        seed = [structure_id, *graph.neighbors(structure_id, hops=1)]
+        try:
+            chunks = _retrieve(seed, question or "overview", locale, db)
+        except KnowledgeServiceUnavailable:
+            return Explanation(KNOWLEDGE_DOWN.get(locale, KNOWLEDGE_DOWN["en"]), [], False)
+        except KnowledgeToolError:
+            chunks = []
+        if not chunks:
+            return Explanation(NO_INFO.get(locale, NO_INFO["en"]), [], False)
+        ctx = "\n".join(f"[{i+1}] {c.text} (src: {c.source})" for i, c in enumerate(chunks))
+        prompt = _PROMPT.format(locale=locale, ctx=ctx, q=q)
+        n =settings.tutor_candidates if (reranker.active or settings.dpo_collect) else 1
+        candidates = _candidates(prompt, route_model(question, structure_id), n)
+    ctx = "\n".join(f"[{i+1}] {c.text} (src: {c.source})" for i, c in enumerate(chunks))
     ranked = reranker.rank(q, candidates)
     if settings.dpo_collect and len(ranked) > 1:
         ok = {c: check_output(c, ctx).allowed for c in ranked}
