@@ -1,0 +1,6 @@
+# Offline DPO track (app/rl/dpo_train.py) and the serve-time re-ranker when RERANKER_PATH is set.
+# Without these the Tutor runs with the identity re-ranker (single base candidate).
+-r requirements.txt
+torch
+transformers
+trl

@@ -21,6 +21,7 @@ guardrails-ai
 imagehash
 fastembed
 pillow
+pytesseract
 pyyaml
 redis>=5
 structlog
