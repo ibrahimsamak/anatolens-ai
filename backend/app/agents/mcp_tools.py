@@ -9,10 +9,8 @@ BACKEND = Path(__file__).resolve().parents[2]
 class KnowledgeServiceUnavailable(RuntimeError):
     """The MCP anatomy server could not be started or reached. Never answer without it."""
 
-
 class KnowledgeToolError(ValueError):
     """The server is up but rejected the call (unknown id, bad arguments)."""
-
 
 def connections() -> dict:
     return {"anatomy": {
@@ -22,11 +20,9 @@ def connections() -> dict:
         "cwd": str(BACKEND), 
         "env": dict(os.environ)}}
 
-
 def _client():
     from langchain_mcp_adapters.client import MultiServerMCPClient
     return MultiServerMCPClient(connections())
-
 
 async def load_mcp_tools():
     try:
