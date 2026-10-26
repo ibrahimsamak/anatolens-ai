@@ -17,16 +17,16 @@ def cheap_model() -> str:
 def route_model(question: str, structure_id: str)-> str:
     return _CFG["strong"] if _REASONING.search(question or "") else _CFG["cheap"]
 
-def _invoke(model: str, prompt) -> str:
+def _invoke(model: str, prompt, temperature: float = 0) -> str:
     trace.get_current_span().set_attribute("llm.model", model)
-    return init_chat_model(model, temperature=0, callbacks=[CostCallback(model)]).invoke(prompt).content
+    return init_chat_model(model, temperature=temperature, callbacks=[CostCallback(model)]).invoke(prompt).content
 
-def invoke_with_fallback(prompt, primary: str, fallback:str)-> str:
+def invoke_with_fallback(prompt, primary: str, fallback:str, temperature: float = 0)-> str:
     try:
-        return _invoke(primary, prompt)
+        return _invoke(primary, prompt, temperature)
     except Exception as e:
         if fallback == primary:
             raise
         log.warning("llm_fallback", primary=primary, fallback=fallback, error=type(e).__name__)
         LLM_FALLBACKS.labels(primary=primary).inc()
-        return _invoke(fallback, prompt)
+        return _invoke(fallback, prompt, temperature)

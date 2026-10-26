@@ -38,7 +38,10 @@ class Settings(BaseSettings):
     jev_url: str = ""
     jev_api_key: str = ""
     jev_timeout: float = 2.0
-
+    reranker_path: str = ""
+    tutor_candidates: int = 3
+    tutor_candidate_temperature: float = 0.7
+    dpo_collect: bool = False
 settings = Settings()
 
 def sqlalchemy_database_url() -> str:

@@ -1,4 +1,5 @@
 import re, yaml
+from difflib import SequenceMatcher
 
 def _norm(s: str) -> str:
     return " ".join(re.sub(r"[^\w ]", "", s.lower()).split())
@@ -25,3 +26,21 @@ class OntologyResolver:
 
     def resolve(self, label: str) -> str | None:
         return self._map.get(_norm(label))
+
+    def resolve_fuzzy(self, label: str, floor: float = 0.82) -> str | None:
+        exact = self.resolve(label)
+        if exact:
+            return exact
+        target = _norm(label)
+        if not target:
+            return None
+        best: dict[str, float] = {}
+        for alias, sid in self._map.items():
+            best[sid] = max(best.get(sid, 0.0), SequenceMatcher(None, target, alias).ratio())
+        ranked = sorted(best.items(), key=lambda x: -x[1])
+        if not ranked or ranked[0][1] < floor:
+            return None
+        if len(ranked) > 1 and ranked[1][1] == ranked[0][1]:
+            return None 
+        return ranked[0][0]
+

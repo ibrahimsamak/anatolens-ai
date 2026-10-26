@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import String, Float, DateTime, Integer, JSON, ForeignKey
+from sqlalchemy import String, Text, Float, DateTime, Integer, JSON, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 from app.models.base import Base
 
@@ -36,4 +36,13 @@ class BanditEvent(Base):
     action: Mapped[str] = mapped_column(String)
     context_json: Mapped[dict] = mapped_column(JSON)
     reward: Mapped[float] = mapped_column(Float)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+class DpoPreference(Base):
+    __tablename__ = "dpo_preferences"
+    id: Mapped[str] = mapped_column(String, primary_key=True)
+    prompt: Mapped[str] = mapped_column(Text)
+    chosen: Mapped[str] = mapped_column(Text)
+    rejected: Mapped[str] = mapped_column(Text)
+    source: Mapped[str] = mapped_column(String, default="judge")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
