@@ -16,6 +16,15 @@ const packs = readdirSync(CONTENT)
 
 const browser = await chromium.launch({ args: ["--use-angle=swiftshader", "--enable-unsafe-swiftshader"] });
 const page = await browser.newPage({ viewport: { width: 640, height: 640 } });
+
+// the lesson page asks for a sign-in first. The lesson endpoints themselves are public, so a local
+// session with an unexpired token-shaped value is enough to get past the redirect.
+const b64 = obj => Buffer.from(JSON.stringify(obj)).toString("base64url");
+const token = `${b64({ alg: "none" })}.${b64({ exp: Math.floor(Date.now() / 1000) + 3600 })}.x`;
+const session = { access_token: token, refresh_token: token,
+                  user: { id: "render-script", email: "", role: "STUDENT", display_name: "render script" } };
+await page.addInitScript(s => localStorage.setItem("anatolens.session", s), JSON.stringify(session));
+
 for (const { dir, id } of packs) {
   await page.goto(`${BASE}/?lesson=${id}`);
   await page.waitForFunction(() => document.querySelector("#mv")?.loaded, null, { timeout: 60000 });

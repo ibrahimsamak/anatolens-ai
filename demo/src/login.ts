@@ -1,11 +1,8 @@
 import { getSession, saveSession, ROLE_LABEL, STAFF, type Role, type Session } from "./auth";
+import { $, API } from "./util";
 
-const API: string = import.meta.env.VITE_API ?? "";
-const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
-
-// Mirrors backend/app/seed_users.py (dev/demo only).
 const DEMO_PASSWORD = "demo1234";
-const DEMO: { email: string; role: Role; name: string }[] = [
+const DEMO_ACCOUNTS: { email: string; role: Role; name: string }[] = [
   { email: "admin@anatolens.dev", role: "SUPER_ADMIN", name: "Sara Admin" },
   { email: "editor@anatolens.dev", role: "CONTENT_EDITOR", name: "Karim Editor" },
   { email: "reviewer@anatolens.dev", role: "MEDICAL_REVIEWER", name: "Dr. Nadia Reviewer" },
@@ -15,17 +12,35 @@ const DEMO: { email: string; role: Role; name: string }[] = [
   { email: "lina@anatolens.dev", role: "STUDENT", name: "Lina" },
 ];
 
-// only follow same-site paths so ?next= can't bounce the user to another origin
-function destination(s: Session): string {
-  const next = new URLSearchParams(location.search).get("next") ?? "";
-  if (next.startsWith("/") && !next.startsWith("//") && !next.startsWith("/login.html")) return next;
-  return STAFF.includes(s.user.role) ? "/review.html" : "/";
+function setStatus(text: string, cls = "") {
+  const el = $("login-status");
+  el.textContent = text;
+  el.className = cls;
 }
 
-function setStatus(text: string, cls = "") {
-  const s = $("login-status");
-  s.textContent = text;
-  s.className = cls;
+function destination(session: Session): string {
+  const next = new URLSearchParams(location.search).get("next") ?? "";
+  const isLocalPath = next.startsWith("/") && !next.startsWith("//");
+  if (isLocalPath && !next.startsWith("/login.html")) return next;
+  if (STAFF.includes(session.user.role)) return "/review.html";
+  return "/";
+}
+
+async function login(email: string, password: string): Promise<Session> {
+  let res: Response;
+  try {
+    res = await fetch(`${API}/api/v1/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+  } catch {
+    throw new Error("Backend unavailable. Is the API running?");
+  }
+  if (res.status === 401) throw new Error("Wrong email or password.");
+  if (res.status === 422) throw new Error("Enter a valid email address.");
+  if (!res.ok) throw new Error(`Sign-in failed (${res.status} ${res.statusText})`);
+  return res.json();
 }
 
 async function signIn(email: string, password: string) {
@@ -33,44 +48,48 @@ async function signIn(email: string, password: string) {
   submit.disabled = true;
   setStatus("Signing in…");
   try {
-    const r = await fetch(`${API}/api/v1/auth/login`, {
-      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, password }),
-    });
-    if (r.status === 401) throw new Error("Wrong email or password.");
-    if (r.status === 422) throw new Error("Enter a valid email address.");
-    if (!r.ok) throw new Error(`Sign-in failed (${r.status} ${r.statusText})`);
-    const s: Session = await r.json();
-    saveSession(s);
-    setStatus(`Welcome, ${s.user.display_name}`, "ok");
-    location.href = destination(s);
+    const session = await login(email, password);
+    saveSession(session);
+    setStatus(`Welcome, ${session.user.display_name}`, "ok");
+    location.href = destination(session);
   } catch (e) {
-    const msg = e instanceof TypeError ? "Backend unavailable. Is the API running?" : (e as Error).message;
-    setStatus(msg, "error");
+    setStatus((e as Error).message, "error");
     submit.disabled = false;
   }
 }
 
+function demoButton(account: typeof DEMO_ACCOUNTS[number]): HTMLButtonElement {
+  const name = document.createElement("b");
+  name.textContent = account.name;
+  const detail = document.createElement("small");
+  detail.textContent = `${ROLE_LABEL[account.role]} · ${account.email}`;
+
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "demo-account";
+  btn.append(name, detail);
+  btn.onclick = () => {
+    $<HTMLInputElement>("email").value = account.email;
+    $<HTMLInputElement>("password").value = DEMO_PASSWORD;
+    signIn(account.email, DEMO_PASSWORD);
+  };
+  return btn;
+}
+
 $<HTMLFormElement>("login-form").onsubmit = e => {
   e.preventDefault();
-  const email = $<HTMLInputElement>("email").value.trim(), password = $<HTMLInputElement>("password").value;
-  if (!email || !password) { setStatus("Enter your email and password.", "error"); return; }
+  const email = $<HTMLInputElement>("email").value.trim();
+  const password = $<HTMLInputElement>("password").value;
+  if (!email || !password) {
+    setStatus("Enter your email and password.", "error");
+    return;
+  }
   signIn(email, password);
 };
 
-$("demo-list").replaceChildren(...DEMO.map(d => {
-  const b = document.createElement("button");
-  b.type = "button";
-  b.className = "demo-account";
-  b.innerHTML = `<b></b><small></small>`;
-  b.querySelector("b")!.textContent = d.name;
-  b.querySelector("small")!.textContent = `${ROLE_LABEL[d.role]} · ${d.email}`;
-  b.onclick = () => {
-    $<HTMLInputElement>("email").value = d.email;
-    $<HTMLInputElement>("password").value = DEMO_PASSWORD;
-    signIn(d.email, DEMO_PASSWORD);
-  };
-  return b;
-}));
+$("demo-list").replaceChildren(...DEMO_ACCOUNTS.map(demoButton));
 
-const existing = getSession();
-if (existing) setStatus(`Signed in as ${existing.user.display_name}. Sign in again to switch account.`);
+const current = getSession();
+if (current) {
+  setStatus(`Signed in as ${current.user.display_name}. Sign in again to switch account.`);
+}
