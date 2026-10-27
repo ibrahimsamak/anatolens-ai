@@ -7,6 +7,8 @@ from alembic import context
 from app.models.base import Base
 import app.models.content
 import app.models.learning
+import app.models.user
+import app.models.review
 from app.core.config import sqlalchemy_database_url
 
 config = context.config

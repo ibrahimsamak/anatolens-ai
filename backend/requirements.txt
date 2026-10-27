@@ -36,5 +36,9 @@ pytest
 fakeredis
 pytest-asyncio
 httpx
-fastmcp>=3,<4                   # fastmcp 4 needs mcp 2; the adapter still needs mcp 1
+fastmcp>=3,<4
 langchain-mcp-adapters>=0.3.2,<0.4
+bcrypt>=4.2
+PyJWT>=2.10
+email-validator
+langgraph-checkpoint-postgres>=2

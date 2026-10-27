@@ -5,7 +5,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 from strawberry.fastapi import GraphQLRouter
 from app.core.logging import configure_logging
-from app.api import recognition, lessons, tutor, quiz
+from app.api import recognition, lessons, tutor, quiz, auth, admin
 from app.api.graphql_schema import schema, get_context
 from app.obs.tracing import setup_tracing, setup_mlflow, tracer
 from app.obs.metrics import REQUEST_LATENCY
@@ -32,7 +32,7 @@ app.mount("/metrics", make_asgi_app())
 
 
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
-for m in (recognition, lessons, tutor, quiz):
+for m in (recognition, lessons, tutor, quiz, auth, admin):
     app.include_router(m.router)
 app.include_router(GraphQLRouter(schema, context_getter=get_context), prefix="/graphql")
 

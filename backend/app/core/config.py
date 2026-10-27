@@ -45,6 +45,9 @@ class Settings(BaseSettings):
     knowledge_source: Literal["direct", "mcp"] = "direct"
     tutor_mode: Literal["pipeline", "agent"] = "pipeline"
     agent_max_steps: int = 6
+    jwt_secret: str = "dev-only-jwt-secret-change-me-in-production"
+    access_token_ttl: int = 3600
+    refresh_token_ttl: int = 7 * 24 * 3600
 settings = Settings()
 
 def sqlalchemy_database_url() -> str:
