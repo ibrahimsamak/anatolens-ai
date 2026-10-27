@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AnatoLens Review</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ffc400'/%3E%3Cstop offset='.5' stop-color='%23e10600'/%3E%3Cstop offset='1' stop-color='%23111'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='23' fill='none' stroke='url(%23g)' stroke-width='15'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+<body>
+  <header>
+    <h1><span class="logo" aria-hidden="true"></span>AnatoLens <span>· Content review</span></h1>
+    <div class="actions">
+      <a class="btn" href="/">Lessons</a>
+    </div>
+  </header>
+  <div class="results">
+    <section id="author-box" hidden>
+      <h2>Draft with AI</h2>
+      <p class="hint">The draft pauses at medical review. It only reaches the tutor after a medical reviewer approves it.</p>
+      <div class="row wrap">
+        <select id="author-lesson" aria-label="Lesson"></select>
+        <select id="author-structure" aria-label="Structure"></select>
+        <button id="author-btn" type="button" class="primary">Generate draft</button>
+      </div>
+      <p id="author-status" role="status"></p>
+    </section>
+
+    <div class="row wrap queue-head">
+      <h2>Review queue</h2>
+      <select id="review-filter" aria-label="Show">
+        <option value="MEDICAL_REVIEW">Awaiting medical review</option>
+        <option value="APPROVED">Approved</option>
+        <option value="CONTENT_REVIEW">Sent back</option>
+        <option value="">All</option>
+      </select>
+    </div>
+    <p id="review-status" role="status">Loading…</p>
+    <div id="review-list" class="review-list"></div>
+  </div>
+  <script type="module" src="/src/review.ts"></script>
+</body>
+</html>

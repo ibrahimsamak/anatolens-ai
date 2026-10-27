@@ -41,5 +41,7 @@ function contentPacks(): Plugin {
 
 export default defineConfig({
   plugins: [contentPacks()],
+  build: { rollupOptions: { input: Object.fromEntries(["index", "login", "results", "review", "ontology", "content_map"]
+    .map(p => [p, resolve(__dirname, `${p}.html`)])) } },
   server: { port: 5173, host: true, proxy: { "/api": process.env.API_TARGET ?? "http://127.0.0.1:8000" } },
 });

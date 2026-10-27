@@ -1,6 +1,13 @@
+import { mountUserBadge, requireSession } from "./auth";
+
 const API: string = import.meta.env.VITE_API ?? "";
 const params = new URLSearchParams(location.search);
-const USER = params.get("user") ?? "demo-user";
+const session = requireSession();
+mountUserBadge(session);
+// students see their own results; teachers and admins can open a student's with ?user=<id>
+const canViewOthers = session.user.role === "TEACHER" || session.user.role === "SUPER_ADMIN";
+const USER = (canViewOthers && params.get("user")) || session.user.id;
+const WHO = USER === session.user.id ? session.user.display_name : USER;
 const LESSON = params.get("lesson");
 
 type HistoryRow = { at: string; lesson_id: string; lesson_title: string; structure_id: string;
@@ -41,7 +48,7 @@ function emptyRow(body: HTMLElement, cols: number, text: string) {
 }
 
 async function load() {
-  const qs = new URLSearchParams({ user: USER, ...(LESSON ? { lesson: LESSON } : {}) });
+  const qs = new URLSearchParams(LESSON ? { lesson: LESSON } : {});
   $("back-link").setAttribute("href", `/?${qs}`);
   let history: HistoryRow[], progress: ProgressRow[];
   try {
@@ -58,8 +65,8 @@ async function load() {
   const correct = history.filter(h => h.correct).length;
   const pct = history.length ? Math.round((correct / history.length) * 100) : 0;
   $("results-status").textContent = history.length
-    ? `Results for ${USER}`
-    : `No quiz answers yet for ${USER}. Open a lesson and press “Quiz me”.`;
+    ? `Results for ${WHO}`
+    : `No quiz answers yet for ${WHO}. Open a lesson and press “Quiz me”.`;
   $("t-grade").textContent = history.length ? grade(pct) : "–";
   $("t-score").textContent = history.length ? `${pct}%` : "–";
   $("t-correct").textContent = String(correct);

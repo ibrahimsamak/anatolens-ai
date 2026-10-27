@@ -1,5 +1,8 @@
 import "@google/model-viewer";
 import { bestARMode, startPseudoAR } from "./ar";
+import { mountUserBadge, requireSession, STAFF } from "./auth";
+
+const session = requireSession();
 
 const API: string = import.meta.env.VITE_API ?? "";
 const LESSON = new URLSearchParams(location.search).get("lesson") ?? "spine_001";
@@ -154,8 +157,10 @@ type QuizQuestion = { id: string; prompt: string; choices: string[]; difficulty:
 type QuizResult = { correct: boolean; mastery: number; reward: number };
 type ProgressRow = { structure_id: string; mastery: number; attempts: number };
 
-const USER = new URLSearchParams(location.search).get("user") ?? "demo-user";
-$("results-link").setAttribute("href", `/results.html?${new URLSearchParams({ user: USER, lesson: LESSON })}`);
+const USER = session.user.id;
+$("results-link").setAttribute("href", `/results.html?${new URLSearchParams({ lesson: LESSON })}`);
+$("review-link").hidden = !STAFF.includes(session.user.role);
+mountUserBadge(session);
 
 async function postJSON<T>(url: string, body: unknown): Promise<T> {
   const r = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });

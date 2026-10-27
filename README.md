@@ -27,6 +27,7 @@ python -m venv .venv && source .venv/bin/activate   # .venv\Scripts\activate on 
 pip install -e . -r requirements.txt
 cp .env.example .env    # add OPENAI_API_KEY
 alembic upgrade head
+python -m app.seed_users
 python -c "from app.db.session import SessionLocal; from app.content.ingest import ingest_pack; db=SessionLocal(); [print(ingest_pack(p, db)) for p in ('../content/spine', '../content/heart')]"
 uvicorn app.main:app --reload
 ```
@@ -41,12 +42,26 @@ npm run dev
 
 It calls the API on `http://localhost:8000` (change with `VITE_API`). The dev server also serves the models straight from `content/`.
 
+The demo opens on a login screen. Click one of the demo accounts to sign in:
+
+| Account | Role | What it can do |
+| --- | --- | --- |
+| `admin@anatolens.dev` | SUPER_ADMIN | everything, creates non-student accounts |
+| `editor@anatolens.dev` | CONTENT_EDITOR | creates lessons, starts AI drafts (`/review.html`) |
+| `reviewer@anatolens.dev` | MEDICAL_REVIEWER | approves or sends back AI drafts |
+| `teacher@anatolens.dev` | TEACHER | lessons, quiz, a student's results via `results.html?user=<id>` |
+| `amira@` / `omar@` / `lina@anatolens.dev` | STUDENT | lessons, quiz, own results |
+
+AI drafts pause at medical review (a LangGraph `interrupt()` on a Postgres checkpointer, so a pending review survives a restart). Only an approved draft is written to the knowledge base as `APPROVED`. A rejected draft goes back to `CONTENT_REVIEW`.
+
 Endpoints:
 - `POST /api/v1/recognition/page` (image upload)
 - `GET /api/v1/lessons/{id}`, `GET /api/v1/lessons/{id}/structures`
 - `POST /api/v1/structures/{id}/explain`
 - `POST /api/v1/tutor/ask` (SSE)
 - `/graphql`
+- `POST /api/v1/auth/register|login|refresh`, `GET /api/v1/auth/me` (JWT bearer; self-registration is STUDENT only)
+- `POST /api/v1/admin/lessons`, `POST /api/v1/admin/lessons/{id}/transition`, `POST /api/v1/admin/lessons/{id}/author?structure_id=`, `GET /api/v1/admin/reviews`, `POST /api/v1/admin/review/{thread_id}` (role-guarded)
 
 ## Tests
 

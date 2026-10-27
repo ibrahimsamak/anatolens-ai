@@ -1,4 +1,7 @@
 import { test, expect, type Page } from "@playwright/test";
+import { signedIn } from "./session";
+
+test.beforeEach(async ({ page }) => { await signedIn(page); });
 
 const API = "**/api/v1";
 
