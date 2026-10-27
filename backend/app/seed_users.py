@@ -6,6 +6,7 @@ from app.db.session import SessionLocal
 from app.models.user import User
 
 DEMO_PASSWORD = "demo1234"
+
 DEMO_USERS = [
     ("demo-admin", "admin@anatolens.dev", "SUPER_ADMIN", "Sara Admin"),
     ("demo-editor", "editor@anatolens.dev", "CONTENT_EDITOR", "Karim Editor"),
@@ -16,21 +17,28 @@ DEMO_USERS = [
     ("demo-student-lina", "lina@anatolens.dev", "STUDENT", "Lina (student)"),
 ]
 
-def seed_users(db, password: str = DEMO_PASSWORD) -> list[User]:
+
+def seed_users(db, password=DEMO_PASSWORD):
     hashed = hash_password(password)
-    out = []
-    for uid, email, role, name in DEMO_USERS:
-        u = db.execute(select(User).where(User.email == email)).scalar_one_or_none() or User(id=uid, email=email)
-        u.password_hash, u.role, u.display_name = hashed, role, name
-        db.add(u)
-        out.append(u)
+    users = []
+    for user_id, email, role, name in DEMO_USERS:
+        user = db.execute(select(User).where(User.email == email)).scalar_one_or_none()
+        if user is None:
+            user = User(id=user_id, email=email)
+            db.add(user)
+        user.password_hash = hashed
+        user.role = role
+        user.display_name = name
+        users.append(user)
     db.commit()
-    return out
+    return users
+
 
 if __name__ == "__main__":
-    ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--password", default=DEMO_PASSWORD)
-    args = ap.parse_args()
+    parser = argparse.ArgumentParser(description="Create the demo accounts.")
+    parser.add_argument("--password", default=DEMO_PASSWORD)
+    args = parser.parse_args()
+
     with SessionLocal() as db:
         for u in seed_users(db, args.password):
             print(f"{u.role:<17} {u.email:<26} {u.display_name}")
