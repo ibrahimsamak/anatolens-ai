@@ -1,6 +1,8 @@
+import os
 import yaml
 from rdflib import Graph, URIRef
 from collections import deque
+from app.core.logging import log
 
 NS = "https://anatolens.ai/anatomy#"
 
@@ -34,6 +36,12 @@ class AnatomyGraph:
                         frontier.append((s, d + 1))
         return seen
 
+    def objects(self, node_id: str, predicate: str) -> set[str]:
+        return {str(o).removeprefix(NS) for o in self.g.objects(self._uri(node_id), self._uri(predicate))}
+
+    def add_edge(self, subject_id: str, predicate: str, object_id: str) -> None:
+        self.g.add((self._uri(subject_id), self._uri(predicate), self._uri(object_id)))
+
 
 def build_graph(*structures_yaml_paths: str) -> AnatomyGraph:
     g = Graph()
@@ -48,3 +56,19 @@ def build_graph(*structures_yaml_paths: str) -> AnatomyGraph:
             for t in targets:
                 g.add((subj, pred, URIRef(NS + t)))
     return AnatomyGraph(g)
+
+def build_graph_backend(*paths: str):
+    paths = [str(p) for p in paths] or ["../content/spine/structures.yaml"]
+    if os.getenv("GRAPH_BACKEND", "rdflib") != "neo4j":
+        return build_graph(*paths)
+    try:
+        from neo4j import GraphDatabase
+        from app.graph.neo4j_graph import Neo4jAnatomyGraph, load_structures_into_neo4j
+        driver = GraphDatabase.driver(os.getenv("NEO4J_URI", "bolt://localhost:7687"),
+                                      auth=("neo4j", os.getenv("NEO4J_PASSWORD", "anatolens")))
+        driver.verify_connectivity()
+        load_structures_into_neo4j(driver, *paths)
+        return Neo4jAnatomyGraph(driver)
+    except Exception as e:
+        log.warning("neo4j_unavailable_fallback_rdflib", error=str(e))
+        return build_graph(*paths)

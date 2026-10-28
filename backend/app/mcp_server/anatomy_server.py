@@ -75,4 +75,6 @@ def get_quiz_bank(lesson_id: str, structure_id: str | None = None, limit: int = 
 if __name__ == "__main__":
     import sys, structlog
     structlog.configure(logger_factory=structlog.PrintLoggerFactory(sys.stderr))   # stdout is the MCP channel
+    from app.api.deps import apply_approved_edges
+    apply_approved_edges(_graph)
     mcp.run()
