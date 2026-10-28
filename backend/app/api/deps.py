@@ -6,13 +6,35 @@ from psycopg.rows import dict_row
 from psycopg_pool import ConnectionPool
 from langgraph.checkpoint.postgres import PostgresSaver
 from app.db.session import SessionLocal
-from app.graph.anatomy_graph import build_graph
+from app.graph.anatomy_graph import build_graph_backend
 from app.core.config import settings
+from app.core.logging import log
 from app.core.security import decode_token, TokenError
 
 CONTENT = Path(__file__).resolve().parents[3] / "content"
-_graph = build_graph(*sorted(CONTENT.glob("*/structures.yaml")))
+_graph = build_graph_backend(*sorted(CONTENT.glob("*/structures.yaml")))
 bearer = HTTPBearer(auto_error=False)
+
+
+def apply_approved_edges(graph=None):
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import Session
+    from app.core.config import sqlalchemy_database_url
+    from app.models.graph_ops import EdgeProposal
+
+    graph = graph or _graph
+    engine = create_engine(sqlalchemy_database_url(), connect_args={"connect_timeout": 5})
+    try:
+        with Session(engine) as db:
+            edges = db.query(EdgeProposal).filter_by(status="APPROVED").all()
+    except Exception as e:
+        log.warning("approved_edges_not_loaded", error=str(e))
+        return 0
+    finally:
+        engine.dispose()
+    for e in edges:
+        graph.add_edge(e.subject_id, e.predicate, e.object_id)
+    return len(edges)
 
 
 def get_db():

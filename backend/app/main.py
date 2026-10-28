@@ -1,4 +1,5 @@
 import time
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -12,7 +13,15 @@ from app.obs.metrics import REQUEST_LATENCY
 from prometheus_client import make_asgi_app
 
 configure_logging()
-app = FastAPI(title="AnatoLens AI")
+
+
+@asynccontextmanager
+async def lifespan(_app):
+    from app.api.deps import apply_approved_edges
+    apply_approved_edges()
+    yield
+
+app = FastAPI(title="AnatoLens AI", lifespan=lifespan)
 
 
 setup_tracing()
@@ -35,6 +44,7 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], all
 for m in (recognition, lessons, tutor, quiz, auth, admin):
     app.include_router(m.router)
 app.include_router(GraphQLRouter(schema, context_getter=get_context), prefix="/graphql")
+
 
 @app.get("/healthz")
 def healthz(): return {"ok": True}

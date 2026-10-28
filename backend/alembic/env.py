@@ -9,6 +9,7 @@ import app.models.content
 import app.models.learning
 import app.models.user
 import app.models.review
+import app.models.graph_ops
 from app.core.config import sqlalchemy_database_url
 
 config = context.config
