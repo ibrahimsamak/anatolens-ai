@@ -31,6 +31,11 @@ def spine_page_image_bytes():
 
 
 @pytest.fixture
+def spine_diagram_bytes():
+    return (CONTENT / "spine" / "assets" / "spine_preview.png").read_bytes()
+
+
+@pytest.fixture
 def noise_image_bytes():
     rng = random.Random(42)
     img = Image.frombytes("L", (256, 256), bytes(rng.getrandbits(8) for _ in range(256 * 256)))
