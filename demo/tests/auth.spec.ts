@@ -11,6 +11,11 @@ async function mockLessons(page: Page) {
     { id: "spine.lumbar_region", mesh_name: "Spine_Lumbar", name_en: "Lumbar region (L1-L5)", name_ar: null } ] }));
 }
 
+test.beforeEach(async ({ page }) => {
+  await page.route(`${API}/admin/proposals**`, r => r.fulfill({ json: [] }));
+  await page.route(`${API}/admin/meshes**`, r => r.fulfill({ json: [] }));
+});
+
 async function mockLogin(page: Page) {
   await page.route(`${API}/auth/login`, r => {
     const { email, password } = r.request().postDataJSON();
@@ -93,6 +98,47 @@ test("editor sees the authoring box but cannot approve", async ({ page }) => {
   await expect(page.locator("#author-structure")).toHaveValue("spine.lumbar_region");
   await expect(page.locator(".review-card")).toBeVisible();
   await expect(page.getByRole("button", { name: "Approve" })).toHaveCount(0);
+});
+
+const PROPOSAL = { id: "p1", lesson_id: "spine_001", subject_id: "spine.lumbar_region", predicate: "part_of",
+  object_id: "spine.cervical_region", confidence: 0.6, status: "AI_GENERATED", conflict: true };
+
+test("reviewer sees a conflicting AI link and can reject it", async ({ page }) => {
+  await signedIn(page, "MEDICAL_REVIEWER", "Dr. Nadia Reviewer");
+  await page.route(`${API}/admin/reviews**`, r => r.fulfill({ json: [] }));
+  let proposals = [PROPOSAL];
+  await page.route(`${API}/admin/proposals**`, r => r.fulfill({ json: proposals }));
+  let decided = "";
+  await page.route(`${API}/admin/proposals/p1/*`, r => {
+    decided = r.request().url().split("/").pop()!;
+    proposals = [];
+    r.fulfill({ json: { ...PROPOSAL, status: "DRAFT" } });
+  });
+  await page.goto("/review.html");
+  await expect(page.locator("#analyze-box")).toBeHidden();
+  const card = page.locator("#suggest-list .review-card");
+  await expect(card).toContainText("lumbar region → part of → cervical region");
+  await expect(card).toContainText("Contradicts approved anatomy");
+  await card.getByRole("button", { name: "Reject" }).click();
+  await expect(page.locator("#suggest-status")).toHaveText("Nothing here yet.");
+  expect(decided).toBe("reject");
+});
+
+test("editor analyzes a diagram and sees the summary", async ({ page }) => {
+  await signedIn(page, "CONTENT_EDITOR", "Karim Editor");
+  await mockLessons(page);
+  await page.route(`${API}/admin/reviews**`, r => r.fulfill({ json: [] }));
+  await page.route(`${API}/admin/lessons/spine_001/analyze**`, r => r.fulfill({ status: 201, json: {
+    regions: [{ label: "Lumbar", structure_id: "spine.lumbar_region" }], proposals: [PROPOSAL], mesh: null,
+    known: [{ subject_id: "spine.sacral_region", predicate: "connects_to", object_id: "spine.coccygeal_region" }],
+    notes: ["3D skipped: transformers is not installed"] } }));
+  await page.goto("/review.html");
+  await expect(page.locator("#analyze-btn")).toBeDisabled();
+  await page.locator("#analyze-file").setInputFiles({ name: "d.png", mimeType: "image/png", buffer: Buffer.from("png") });
+  await page.locator("#analyze-btn").click();
+  await expect(page.locator("#analyze-status")).toContainText("Found parts: lumbar region");
+  await expect(page.locator("#analyze-status")).toContainText("Found 2 link(s): 1 new sent for review, 1 already known");
+  await expect(page.locator("#suggest-list .review-card")).toHaveCount(0);
 });
 
 test("student opening the review page is sent back to the lessons", async ({ page }) => {

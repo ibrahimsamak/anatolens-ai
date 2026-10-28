@@ -26,6 +26,29 @@
       <p id="author-status" role="status"></p>
     </section>
 
+    <section id="analyze-box" hidden>
+      <h2>Analyze a diagram</h2>
+      <p class="hint">AI finds the labelled parts and the links between them. Every link waits for a medical reviewer below.</p>
+      <div class="row wrap">
+        <select id="analyze-lesson" aria-label="Lesson"></select>
+        <label class="file-btn">Choose image<input id="analyze-file" type="file" accept="image/*" class="visually-hidden"></label>
+        <label class="check"><input id="analyze-3d" type="checkbox"> also try 3D</label>
+        <button id="analyze-btn" type="button" class="primary" disabled>Analyze</button>
+      </div>
+      <p id="analyze-status" role="status"></p>
+    </section>
+
+    <div class="row wrap queue-head">
+      <h2>AI suggestions</h2>
+      <select id="suggest-filter" aria-label="Show">
+        <option value="AI_GENERATED">Awaiting review</option>
+        <option value="APPROVED">Approved</option>
+        <option value="DRAFT">Rejected</option>
+      </select>
+    </div>
+    <p id="suggest-status" role="status">Loading…</p>
+    <div id="suggest-list" class="review-list"></div>
+
     <div class="row wrap queue-head">
       <h2>Review queue</h2>
       <select id="review-filter" aria-label="Show">
